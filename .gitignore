@@ -1,0 +1,15 @@
+node_modules/
+.next/
+.eve/
+.dealfinder/
+contexts.json
+*.enc.json
+.output/
+.vercel/
+.env*
+!.env.example
+*.tsbuildinfo
+coverage/
+.DS_Store
+AGENT.md
+CLAUDE.md

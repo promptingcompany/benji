@@ -1,0 +1,75 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.5.1/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"ignoreUnknown": true,
+		"includes": ["**", "!node_modules", "!.next", "!.eve", "!.output"]
+	},
+	"formatter": {
+		"lineWidth": 80,
+		"enabled": true,
+		"indentStyle": "tab",
+		"indentWidth": 2
+	},
+	"json": {
+		"formatter": {
+			"enabled": true
+		}
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"preset": "recommended",
+			"style": {
+				"noNestedTernary": "error",
+				"noParameterAssign": {
+					"level": "error",
+					"options": {
+						"propertyAssignment": "deny"
+					}
+				}
+			}
+		},
+		"domains": {
+			"next": "recommended",
+			"react": "recommended"
+		}
+	},
+	"overrides": [
+		{
+			"includes": [
+				"agent/lib/browser-runtime.ts",
+				"server/browser/context-metadata-store.ts"
+			],
+			"linter": {
+				"rules": {
+					"style": {
+						"noParameterAssign": "off"
+					}
+				}
+			}
+		},
+		{
+			"includes": [
+				"scripts/test-parallel-production.mjs",
+				"scripts/test-session-retirement.mjs"
+			],
+			"linter": {
+				"rules": {
+					"correctness": {
+						"noUnsafeFinally": "off"
+					}
+				}
+			}
+		}
+	]
+}

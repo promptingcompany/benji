@@ -1,0 +1,254 @@
+/**
+ * Theme definitions for dealfinder
+ * CSS variables and Tailwind theme configuration
+ * This file should be imported BEFORE tailwindcss in consuming apps
+ */
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+	--radius: 0.625rem;
+	--legend-marker-size: 1.25rem;
+	--legend-marker-radius: 0.25rem;
+	--legend-marker-tint: 20%;
+	--grey-smoked-100: #ededed;
+	--grey-smoked-200: #e5e5e5;
+	--grey-smoked-300: #e0e0e0;
+	--grey-smoked-400: #e6e6e6;
+	--grey-smoked-500: #c5c5c5;
+	--grey-smoked-600: #a5a5a5;
+	--grey-smoked-700: #8c8c8c;
+	--grey-smoked-800: #7b7b7b;
+	--grey-smoked-900: #616161;
+	--grey-smoked-1000: #171717;
+	--background: oklch(1 0 0);
+	--foreground: var(--grey-smoked-1000);
+	--card: oklch(1 0 0);
+	--card-foreground: var(--grey-smoked-1000);
+	--popover: oklch(1 0 0);
+	--popover-foreground: var(--grey-smoked-1000);
+	--primary: var(--grey-smoked-1000);
+	--primary-foreground: oklch(0.985 0 0);
+	--secondary: var(--grey-smoked-100);
+	--secondary-foreground: var(--grey-smoked-1000);
+	--muted: var(--grey-smoked-100);
+	--muted-foreground: var(--grey-smoked-900);
+	--accent: var(--grey-smoked-100);
+	--accent-foreground: var(--grey-smoked-1000);
+	--destructive: oklch(0.577 0.245 27.325);
+	--destructive-foreground: oklch(0.985 0 0);
+	--success: oklch(0.557 0.179 149.579);
+	--highlight: oklch(0.852 0.199 91.936 / 0.22);
+	--highlight-foreground: var(--foreground);
+	--trend-rising: oklch(0.49 0.2 264);
+	--trend-steady: oklch(0.6 0 0);
+	--trend-cooling: oklch(0.55 0.18 41);
+	--trend-none: oklch(0.66 0 0);
+	--trend-fill-foreground: oklch(1 0 0);
+	--border: var(--grey-smoked-200);
+	--input: var(--grey-smoked-300);
+	--ring: var(--grey-smoked-600);
+	--chart-1: oklch(0.6 0.18 264.376);
+	--chart-2: oklch(0.6 0.118 184.704);
+	--chart-3: oklch(0.398 0.07 227.392);
+	--chart-4: oklch(0.828 0.189 84.429);
+	--chart-5: oklch(0.769 0.188 70.08);
+	/* Categorical series palette. --chart-* is a 5-token accent set that repeats
+	   badly past a handful of lines; these 15 are hue-spaced for charts with one
+	   line per competitor. Ordered so adjacent indexes are far apart in hue. */
+	--series-1: oklch(0.62 0.2 25);
+	--series-2: oklch(0.68 0.16 55);
+	--series-3: oklch(0.6 0.13 95);
+	--series-4: oklch(0.66 0.16 135);
+	--series-5: oklch(0.55 0.11 168);
+	--series-6: oklch(0.63 0.11 200);
+	--series-7: oklch(0.55 0.14 232);
+	--series-8: oklch(0.52 0.17 292);
+	--series-9: oklch(0.6 0.2 322);
+	--series-10: oklch(0.58 0.17 352);
+	--series-11: oklch(0.45 0.14 40);
+	--series-12: oklch(0.48 0.1 150);
+	--series-13: oklch(0.42 0.08 215);
+	--series-14: oklch(0.5 0.14 305);
+	--series-15: oklch(0.72 0.14 110);
+	--sidebar: oklch(0.985 0 0);
+	--sidebar-foreground: var(--grey-smoked-1000);
+	--sidebar-primary: var(--grey-smoked-1000);
+	--sidebar-primary-foreground: oklch(0.985 0 0);
+	--sidebar-accent: var(--grey-smoked-100);
+	--sidebar-accent-foreground: var(--grey-smoked-1000);
+	--sidebar-border: var(--grey-smoked-200);
+	--sidebar-ring: var(--grey-smoked-600);
+}
+
+.dark {
+	--grey-smoked-100: oklch(0.165 0.007 264);
+	--grey-smoked-200: oklch(0.197 0.008 264);
+	--grey-smoked-300: oklch(0.256 0.011 264);
+	--grey-smoked-400: oklch(0.303 0.013 264);
+	--grey-smoked-500: oklch(0.396 0.016 264);
+	--grey-smoked-600: oklch(0.548 0.02 264);
+	--grey-smoked-700: oklch(0.645 0.018 256);
+	--grey-smoked-800: oklch(0.716 0.016 256);
+	--grey-smoked-900: oklch(0.86 0.008 256);
+	--grey-smoked-1000: oklch(0.932 0.004 256);
+	--background: var(--grey-smoked-100);
+	--foreground: var(--grey-smoked-1000);
+	--card: var(--grey-smoked-200);
+	--card-foreground: var(--grey-smoked-1000);
+	--popover: var(--grey-smoked-200);
+	--popover-foreground: var(--grey-smoked-1000);
+	--primary: var(--grey-smoked-1000);
+	--primary-foreground: var(--grey-smoked-100);
+	--secondary: var(--grey-smoked-300);
+	--secondary-foreground: var(--grey-smoked-1000);
+	--muted: var(--grey-smoked-300);
+	--muted-foreground: var(--grey-smoked-800);
+	--accent: var(--grey-smoked-400);
+	--accent-foreground: var(--grey-smoked-1000);
+	--destructive: oklch(0.704 0.191 22.216);
+	--destructive-foreground: oklch(0.985 0 0);
+	--success: oklch(0.647 0.179 149.579);
+	--trend-rising: oklch(0.74 0.13 265);
+	--trend-steady: oklch(0.72 0 0);
+	--trend-cooling: oklch(0.73 0.15 52);
+	--trend-none: oklch(0.6 0 0);
+	--trend-fill-foreground: oklch(0.18 0 0);
+	--border: var(--grey-smoked-300);
+	--input: var(--grey-smoked-400);
+	--ring: var(--grey-smoked-600);
+	--chart-1: oklch(0.55 0.243 264.376);
+	--chart-2: oklch(0.696 0.17 162.48);
+	--chart-3: oklch(0.769 0.188 70.08);
+	--chart-4: oklch(0.627 0.265 303.9);
+	--chart-5: oklch(0.645 0.246 16.439);
+	/* Same hues, lifted for a dark surface. */
+	--series-1: oklch(0.7 0.18 25);
+	--series-2: oklch(0.76 0.15 60);
+	--series-3: oklch(0.8 0.14 95);
+	--series-4: oklch(0.75 0.16 138);
+	--series-5: oklch(0.72 0.12 168);
+	--series-6: oklch(0.74 0.11 200);
+	--series-7: oklch(0.68 0.14 232);
+	--series-8: oklch(0.66 0.18 292);
+	--series-9: oklch(0.7 0.19 322);
+	--series-10: oklch(0.7 0.17 352);
+	--series-11: oklch(0.6 0.14 40);
+	--series-12: oklch(0.62 0.1 150);
+	--series-13: oklch(0.58 0.09 215);
+	--series-14: oklch(0.6 0.15 305);
+	--series-15: oklch(0.85 0.15 110);
+	--sidebar: var(--grey-smoked-200);
+	--sidebar-foreground: var(--grey-smoked-1000);
+	--sidebar-primary: oklch(0.488 0.243 264.376);
+	--sidebar-primary-foreground: oklch(0.985 0 0);
+	--sidebar-accent: var(--grey-smoked-300);
+	--sidebar-accent-foreground: var(--grey-smoked-1000);
+	--sidebar-border: var(--grey-smoked-300);
+	--sidebar-ring: var(--grey-smoked-600);
+}
+
+@theme inline {
+	--color-background: var(--background);
+	--color-foreground: var(--foreground);
+	--color-card: var(--card);
+	--color-card-foreground: var(--card-foreground);
+	--color-popover: var(--popover);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-primary: var(--primary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-secondary: var(--secondary);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-muted: var(--muted);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-accent: var(--accent);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-destructive: var(--destructive);
+	--color-destructive-foreground: var(--destructive-foreground);
+	--color-success: var(--success);
+	--color-highlight: var(--highlight);
+	--color-highlight-foreground: var(--highlight-foreground);
+	--color-trend-rising: var(--trend-rising);
+	--color-trend-steady: var(--trend-steady);
+	--color-trend-cooling: var(--trend-cooling);
+	--color-trend-none: var(--trend-none);
+	--color-trend-fill-foreground: var(--trend-fill-foreground);
+	--color-border: var(--border);
+	--color-input: var(--input);
+	--color-ring: var(--ring);
+	--color-chart-1: var(--chart-1);
+	--color-chart-2: var(--chart-2);
+	--color-chart-3: var(--chart-3);
+	--color-chart-4: var(--chart-4);
+	--color-chart-5: var(--chart-5);
+	--color-series-1: var(--series-1);
+	--color-series-2: var(--series-2);
+	--color-series-3: var(--series-3);
+	--color-series-4: var(--series-4);
+	--color-series-5: var(--series-5);
+	--color-series-6: var(--series-6);
+	--color-series-7: var(--series-7);
+	--color-series-8: var(--series-8);
+	--color-series-9: var(--series-9);
+	--color-series-10: var(--series-10);
+	--color-series-11: var(--series-11);
+	--color-series-12: var(--series-12);
+	--color-series-13: var(--series-13);
+	--color-series-14: var(--series-14);
+	--color-series-15: var(--series-15);
+	--color-grey-smoked-100: var(--grey-smoked-100);
+	--color-grey-smoked-200: var(--grey-smoked-200);
+	--color-grey-smoked-300: var(--grey-smoked-300);
+	--color-grey-smoked-400: var(--grey-smoked-400);
+	--color-grey-smoked-500: var(--grey-smoked-500);
+	--color-grey-smoked-600: var(--grey-smoked-600);
+	--color-grey-smoked-700: var(--grey-smoked-700);
+	--color-grey-smoked-800: var(--grey-smoked-800);
+	--color-grey-smoked-900: var(--grey-smoked-900);
+	--color-grey-smoked-1000: var(--grey-smoked-1000);
+	--radius-sm: calc(var(--radius) - 4px);
+	--radius-md: calc(var(--radius) - 2px);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) + 4px);
+	--color-sidebar: var(--sidebar);
+	--color-sidebar-foreground: var(--sidebar-foreground);
+	--color-sidebar-primary: var(--sidebar-primary);
+	--color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+	--color-sidebar-accent: var(--sidebar-accent);
+	--color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+	--color-sidebar-border: var(--sidebar-border);
+	--color-sidebar-ring: var(--sidebar-ring);
+}
+
+.dark {
+	--font-weight-normal: 300;
+}
+
+[data-accent="neutral"] {
+	--accent-base: oklch(0.55 0 0);
+}
+
+[data-accent="blue"] {
+	--accent-base: oklch(0.6 0.18 255);
+	--primary: oklch(0.6 0.18 255);
+}
+
+[data-accent="violet"] {
+	--accent-base: oklch(0.55 0.25 295);
+	--primary: oklch(0.55 0.25 295);
+}
+
+[data-accent="emerald"] {
+	--accent-base: oklch(0.6 0.16 160);
+	--primary: oklch(0.6 0.16 160);
+}
+
+[data-accent="amber"] {
+	--accent-base: oklch(0.72 0.16 70);
+	--primary: oklch(0.72 0.16 70);
+}
+
+[data-accent="rose"] {
+	--accent-base: oklch(0.62 0.22 12);
+	--primary: oklch(0.62 0.22 12);
+}

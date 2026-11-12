@@ -17,6 +17,39 @@ It follows rules drawn from a study of how personal agents shop on live stores:
 - Research first, then ask once for whatever is still missing.
 - Report each checkout step as done, blocked, or not attempted.
 
+## How it works
+
+```mermaid
+flowchart TD
+    request["Shopping request"] --> kind{"What kind of request?"}
+    kind -- "open discovery or comparison" --> research["Research the web (web_search, web_fetch)"]
+    kind -- "named product or buy it" --> sellers
+    research --> product["Pick the product"]
+    product --> sellers["Check at least 3 sellers, brand site included"]
+    sellers --> total["Compare delivered totals and unit prices (compare_offers)"]
+    total --> buy{"Asked to add to cart or check out?"}
+    buy -- no --> recommend["Recommend the product and seller"]
+    buy -- yes --> open["Open the exact product in the browser"]
+    open --> exact{"Exact product and variant in stock?"}
+    exact -- no --> ask["Stop and ask, never substitute"]
+    exact -- yes --> cart["Add to cart, read the cart back"]
+    cart --> guest["Check out as a guest"]
+    guest --> human{"Sign-in, CAPTCHA or one-time code?"}
+    human -- yes --> handoff["Hand off to the shopper (human_handoff)"]
+    handoff --> guest
+    human -- no --> pay["Reach the payment page and stop"]
+    pay --> report["Report each step: done, blocked or not attempted"]
+
+    classDef step fill:#FFFFFF,stroke:#9AA3AF,color:#111827
+    classDef decision fill:#E8F0FE,stroke:#2F6FEB,color:#0B1F44
+    class request,research,product,sellers,total,open,cart,guest,recommend,ask,handoff,pay,report step
+    class kind,buy,exact,human decision
+```
+
+The rules live in [`agent/skills/shopping-research/SKILL.md`](agent/skills/shopping-research/SKILL.md)
+and [`agent/instructions.md`](agent/instructions.md). Every step runs as an Eve workflow step, so a
+conversation can pause for the shopper at a handoff and pick up where it stopped.
+
 ## Keys
 
 Two keys run the full agent. Everything else is optional and off by default.

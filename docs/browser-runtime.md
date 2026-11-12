@@ -34,7 +34,8 @@ Hosted browser sessions always disable network logging and recording.
 | `BENJI_BROWSER_IDLE_MS` | Browser inactivity timeout; defaults to 30 minutes. |
 | `BENJI_CAPTCHA_TIMEOUT_MS` | CAPTCHA wait timeout; defaults to 30 seconds. |
 | `BENJI_DRAFT_CONTEXT_TTL_MS` | Unused draft Context lifetime; defaults to seven days. |
-| `BENJI_CONTEXT_METADATA_PATH` | Context metadata file; defaults to `.benji/contexts.json`. |
+| `BENJI_CONTEXT_METADATA_PATH` | Context metadata file; defaults to `.benji/contexts.json`. Setting it overrides Vercel Blob. |
+| `BLOB_STORE_ID` / `BLOB_READ_WRITE_TOKEN` | Vercel Blob store for Context metadata; set by Vercel when a Blob store is connected to the project. |
 | `BENJI_OPERATOR_USERNAME` / `BENJI_OPERATOR_PASSWORD` | Optional HTTP Basic operator credentials for Benji; password must be at least 32 bytes. |
 | `BENJI_ONEPASSWORD_BACKEND` | `sdk` (default) or explicitly selected `cli`; there is no automatic fallback between accounts or backends. |
 | `BENJI_VAULT_FILE` | Existing encrypted local vault file; defaults to `.benji/vault.enc.json`. |
@@ -67,10 +68,16 @@ tasks get a draft Context. Benji's `context_save` tool names and retains it, and
 `context_create`, and `context_select` manage saved browser identities. Select a separate Context
 for each identity or work boundary.
 
-Eve stores durable conversation and browser state. Context labels use a local
-file scoped to one trusted operator and one process. Preserve that file across restarts.
-Writes are serialized within that process; this file is not a shared database. Multi-instance or
-multi-user deployments need shared durable storage and user isolation before sharing these features.
+Eve stores durable conversation and browser state. Locally, Context labels use a file scoped to
+one trusted operator and one process. Preserve that file across restarts. Writes are serialized
+within that process; this file is not a shared database.
+
+On Vercel, each step of a conversation can run on a different function instance, and each
+instance has its own `/tmp`. Connect a private Vercel Blob store to the project so every
+instance reads the same `benji/contexts.json`. Each write is conditional on the ETag it read,
+so a concurrent update from another instance is reread and retried rather than lost. Without
+a Blob store, a deployment falls back to `/tmp` and a saved Context can be missing from a later
+step. Multi-user deployments still need user isolation before sharing these features.
 
 ## Credentials and OTP
 

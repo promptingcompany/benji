@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import * as blob from "@vercel/blob";
 import { z } from "zod";
 
 const metadataSchema = z.object({
@@ -21,33 +22,41 @@ const metadataSchema = z.object({
 
 export type ContextMetadataFile = z.infer<typeof metadataSchema>;
 
-// All instances in this process share the read/modify/write queue for a path.
+export interface StoredContextMetadata {
+	contents: string;
+	version?: string;
+}
+
+export interface ContextMetadataStorage {
+	readonly key: string;
+	load(): Promise<StoredContextMetadata | undefined>;
+	/** Throws ContextMetadataConflictError when the stored version is no longer `version`. */
+	save(contents: string, version: string | undefined): Promise<void>;
+}
+
+export class ContextMetadataConflictError extends Error {
+	constructor() {
+		super("Browser context metadata changed during the update.");
+	}
+}
+
+const MAX_UPDATE_ATTEMPTS = 5;
+
+// All instances in this process share the read/modify/write queue for a storage key.
 const pendingWrites = new Map<string, Promise<void>>();
 
 export class ContextMetadataStore {
-	private readonly filePath: string;
+	private readonly storage: ContextMetadataStorage;
 
-	constructor(filePath = defaultMetadataPath()) {
-		this.filePath = path.resolve(filePath);
+	constructor(storage: string | ContextMetadataStorage = defaultStorage()) {
+		this.storage =
+			typeof storage === "string"
+				? new FileContextMetadataStorage(storage)
+				: storage;
 	}
 
 	async read(): Promise<ContextMetadataFile> {
-		let contents: string;
-		try {
-			contents = await readFile(this.filePath, "utf8");
-		} catch (error) {
-			if ((error as NodeJS.ErrnoException).code === "ENOENT")
-				return { contexts: {} };
-			throw error;
-		}
-		try {
-			return metadataSchema.parse(JSON.parse(contents));
-		} catch (error) {
-			throw new Error(
-				"Browser context metadata is invalid; refusing to overwrite it.",
-				{ cause: error },
-			);
-		}
+		return parseMetadata(await this.storage.load());
 	}
 
 	async add(id: string, name: string, now = new Date()): Promise<void> {
@@ -123,33 +132,132 @@ export class ContextMetadataStore {
 	private async update(
 		mutate: (value: ContextMetadataFile) => void | false,
 	): Promise<void> {
-		const operation = (
-			pendingWrites.get(this.filePath) ?? Promise.resolve()
-		).then(async () => {
-			const current = await this.read();
-			if (mutate(current) !== false) await this.write(current);
-		});
+		const key = this.storage.key;
+		const operation = (pendingWrites.get(key) ?? Promise.resolve()).then(
+			async () => {
+				for (let attempt = 1; ; attempt++) {
+					const stored = await this.storage.load();
+					const current = parseMetadata(stored);
+					if (mutate(current) === false) return;
+					try {
+						await this.storage.save(
+							JSON.stringify(current, null, 2),
+							stored?.version,
+						);
+						return;
+					} catch (error) {
+						if (
+							!(error instanceof ContextMetadataConflictError) ||
+							attempt >= MAX_UPDATE_ATTEMPTS
+						)
+							throw error;
+					}
+				}
+			},
+		);
 		const tail = operation.catch(() => undefined);
-		pendingWrites.set(this.filePath, tail);
+		pendingWrites.set(key, tail);
 		try {
 			await operation;
 		} finally {
-			if (pendingWrites.get(this.filePath) === tail)
-				pendingWrites.delete(this.filePath);
+			if (pendingWrites.get(key) === tail) pendingWrites.delete(key);
+		}
+	}
+}
+
+function parseMetadata(
+	stored: StoredContextMetadata | undefined,
+): ContextMetadataFile {
+	if (!stored) return { contexts: {} };
+	try {
+		return metadataSchema.parse(JSON.parse(stored.contents));
+	} catch (error) {
+		throw new Error(
+			"Browser context metadata is invalid; refusing to overwrite it.",
+			{ cause: error },
+		);
+	}
+}
+
+/** One process owns the file, so the in-process queue alone keeps writes ordered. */
+export class FileContextMetadataStorage implements ContextMetadataStorage {
+	readonly key: string;
+
+	constructor(filePath: string) {
+		this.key = path.resolve(filePath);
+	}
+
+	async load(): Promise<StoredContextMetadata | undefined> {
+		try {
+			return { contents: await readFile(this.key, "utf8") };
+		} catch (error) {
+			if ((error as NodeJS.ErrnoException).code === "ENOENT") return undefined;
+			throw error;
 		}
 	}
 
-	private async write(value: ContextMetadataFile): Promise<void> {
-		await mkdir(path.dirname(this.filePath), { recursive: true });
-		const temporary = `${this.filePath}.${process.pid}.${randomUUID()}.tmp`;
+	async save(contents: string): Promise<void> {
+		await mkdir(path.dirname(this.key), { recursive: true });
+		const temporary = `${this.key}.${process.pid}.${randomUUID()}.tmp`;
 		try {
-			await writeFile(temporary, JSON.stringify(value, null, 2), {
-				mode: 0o600,
-				flag: "wx",
-			});
-			await rename(temporary, this.filePath);
+			await writeFile(temporary, contents, { mode: 0o600, flag: "wx" });
+			await rename(temporary, this.key);
 		} finally {
 			await rm(temporary, { force: true });
+		}
+	}
+}
+
+export type ContextMetadataBlobClient = Pick<typeof blob, "get" | "put">;
+
+export const CONTEXT_METADATA_BLOB_PATH = "benji/contexts.json";
+
+/**
+ * Shared by every function instance. Each write is conditional on the ETag that was
+ * read, so a concurrent writer on another instance forces a reread instead of a lost update.
+ */
+export class BlobContextMetadataStorage implements ContextMetadataStorage {
+	readonly key: string;
+
+	constructor(
+		private readonly client: ContextMetadataBlobClient = blob,
+		private readonly pathname = CONTEXT_METADATA_BLOB_PATH,
+	) {
+		this.key = `vercel-blob:${pathname}`;
+	}
+
+	async load(): Promise<StoredContextMetadata | undefined> {
+		const result = await this.client.get(this.pathname, {
+			access: "private",
+			useCache: false,
+		});
+		if (!result) return undefined;
+		if (result.statusCode !== 200)
+			throw new Error(
+				`Vercel Blob returned ${result.statusCode} for browser context metadata.`,
+			);
+		return {
+			contents: await new Response(result.stream).text(),
+			version: result.blob.etag,
+		};
+	}
+
+	async save(contents: string, version: string | undefined): Promise<void> {
+		try {
+			await this.client.put(this.pathname, contents, {
+				access: "private",
+				addRandomSuffix: false,
+				allowOverwrite: version !== undefined,
+				contentType: "application/json",
+				ifMatch: version,
+			});
+		} catch (error) {
+			if (error instanceof blob.BlobPreconditionFailedError)
+				throw new ContextMetadataConflictError();
+			// Without a version this was a create, and it fails if another instance created it first.
+			if (version === undefined && (await this.load()))
+				throw new ContextMetadataConflictError();
+			throw error;
 		}
 	}
 }
@@ -163,10 +271,18 @@ export function getContextMetadataStore(): ContextMetadataStore {
 	return globalThis.__benjiContextMetadataStore;
 }
 
-function defaultMetadataPath(): string {
-	return process.env.BENJI_CONTEXT_METADATA_PATH
-		? path.resolve(process.env.BENJI_CONTEXT_METADATA_PATH)
-		: path.join(writableRoot(), ".benji", "contexts.json");
+function defaultStorage(): string | ContextMetadataStorage {
+	if (process.env.BENJI_CONTEXT_METADATA_PATH)
+		return process.env.BENJI_CONTEXT_METADATA_PATH;
+	if (hasBlobStore()) return new BlobContextMetadataStorage();
+	return path.join(writableRoot(), ".benji", "contexts.json");
+}
+
+function hasBlobStore(): boolean {
+	return Boolean(
+		process.env.BLOB_STORE_ID?.trim() ||
+			process.env.BLOB_READ_WRITE_TOKEN?.trim(),
+	);
 }
 
 // Vercel functions can only write under /tmp; the deployed code directory is read-only.

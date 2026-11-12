@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
+import os from "node:os";
 import path from "node:path";
 import { z } from "zod";
 
@@ -165,5 +166,10 @@ export function getContextMetadataStore(): ContextMetadataStore {
 function defaultMetadataPath(): string {
 	return process.env.DEALFINDER_CONTEXT_METADATA_PATH
 		? path.resolve(process.env.DEALFINDER_CONTEXT_METADATA_PATH)
-		: path.join(process.cwd(), ".dealfinder", "contexts.json");
+		: path.join(writableRoot(), ".dealfinder", "contexts.json");
+}
+
+// Vercel functions can only write under /tmp; the deployed code directory is read-only.
+function writableRoot(): string {
+	return process.env.VERCEL ? os.tmpdir() : process.cwd();
 }

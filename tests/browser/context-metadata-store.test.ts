@@ -158,3 +158,28 @@ describe("browser context metadata", () => {
 		expect(await new ContextMetadataStore(filePath).read()).toEqual(value);
 	});
 });
+
+describe("default location", () => {
+	it("saves under the temp directory on Vercel, where the code directory is read-only", async () => {
+		vi.stubEnv("VERCEL", "1");
+		vi.stubEnv("DEALFINDER_CONTEXT_METADATA_PATH", "");
+		const cwd = vi
+			.spyOn(process, "cwd")
+			.mockReturnValue(path.join(directory, "read-only"));
+		const tmpdir = vi.spyOn(os, "tmpdir").mockReturnValue(directory);
+		try {
+			await new ContextMetadataStore().add("ctx_1", "dealfinder");
+			const saved = JSON.parse(
+				await readFile(
+					path.join(directory, ".dealfinder", "contexts.json"),
+					"utf8",
+				),
+			);
+			expect(JSON.stringify(saved)).toContain("ctx_1");
+		} finally {
+			cwd.mockRestore();
+			tmpdir.mockRestore();
+			vi.unstubAllEnvs();
+		}
+	});
+});

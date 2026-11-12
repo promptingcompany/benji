@@ -7,7 +7,7 @@
 	},
 	"scripts": {
 		"dev": "node scripts/dev.mjs",
-		"build:agent": "eve build --skip-sandbox-prewarm && node scripts/package-browser-assets.mjs",
+		"build:agent": "eve build && node scripts/package-browser-assets.mjs",
 		"build": "bun run build:agent && next build",
 		"start": "next start --hostname 127.0.0.1 --port 4320",
 		"test": "vitest run",

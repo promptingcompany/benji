@@ -1,0 +1,8 @@
+.eve
+.next
+.output
+.dealfinder
+.vercel
+node_modules
+.env*
+!.env.example

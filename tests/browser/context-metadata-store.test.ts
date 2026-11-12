@@ -9,10 +9,14 @@ import {
 } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-
+import { BlobPreconditionFailedError, type GetBlobResult } from "@vercel/blob";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-
-import { ContextMetadataStore } from "../../server/browser/context-metadata-store";
+import {
+	BlobContextMetadataStorage,
+	type ContextMetadataBlobClient,
+	ContextMetadataStore,
+	FileContextMetadataStorage,
+} from "../../server/browser/context-metadata-store";
 
 let directory: string;
 let filePath: string;
@@ -127,11 +131,12 @@ describe("browser context metadata", () => {
 	});
 
 	it("removes its temporary file when the atomic replacement fails", async () => {
-		const store = new ContextMetadataStore(filePath);
-		vi.spyOn(store, "read").mockImplementationOnce(async () => {
+		const storage = new FileContextMetadataStorage(filePath);
+		const store = new ContextMetadataStore(storage);
+		vi.spyOn(storage, "load").mockImplementationOnce(async () => {
 			// Simulate another filesystem operation blocking replacement after the read.
 			await mkdir(filePath);
-			return { contexts: {} };
+			return undefined;
 		});
 		await expect(store.add("context_new", "New")).rejects.toThrow();
 		expect(await readdir(directory)).toEqual(["contexts.json"]);
@@ -154,6 +159,137 @@ describe("browser context metadata", () => {
 		};
 		await writeFile(filePath, JSON.stringify(value));
 		expect(await new ContextMetadataStore(filePath).read()).toEqual(value);
+	});
+});
+
+function saved(name: string) {
+	const at = "2026-11-12T00:00:00.000Z";
+	return { name, createdAt: at, updatedAt: at };
+}
+
+/** One private Blob store shared by every simulated function instance. */
+function fakeBlobStore() {
+	const blobs = new Map<string, { contents: string; etag: string }>();
+	let revision = 0;
+	const puts: { ifMatch?: string; allowOverwrite?: boolean }[] = [];
+	const client = {
+		async get(pathname: string, options: { access: string }) {
+			expect(options.access).toBe("private");
+			const stored = blobs.get(pathname);
+			if (!stored) return null;
+			return {
+				statusCode: 200,
+				stream: new Response(stored.contents).body,
+				headers: new Headers(),
+				blob: { etag: stored.etag },
+			} as unknown as GetBlobResult;
+		},
+		async put(
+			pathname: string,
+			body: string,
+			options: { access: string; allowOverwrite?: boolean; ifMatch?: string },
+		) {
+			expect(options.access).toBe("private");
+			puts.push({
+				ifMatch: options.ifMatch,
+				allowOverwrite: options.allowOverwrite,
+			});
+			const stored = blobs.get(pathname);
+			if (options.ifMatch !== undefined && stored?.etag !== options.ifMatch)
+				throw new BlobPreconditionFailedError();
+			if (stored && !options.allowOverwrite)
+				throw new Error("This blob already exists.");
+			const etag = `"etag-${++revision}"`;
+			blobs.set(pathname, { contents: body, etag });
+			return { etag };
+		},
+	};
+	const read = client.get;
+	return {
+		blobs,
+		puts,
+		writeFromAnotherInstanceAfterNextRead(
+			contexts: Record<string, ReturnType<typeof saved>>,
+		) {
+			client.get = async (pathname, options) => {
+				client.get = read;
+				const result = await read(pathname, options);
+				blobs.set(pathname, {
+					contents: JSON.stringify({ contexts }),
+					etag: `"etag-${++revision}"`,
+				});
+				return result;
+			};
+		},
+		instance: () =>
+			new ContextMetadataStore(
+				new BlobContextMetadataStorage(
+					client as unknown as ContextMetadataBlobClient,
+				),
+			),
+	};
+}
+
+describe("Vercel Blob metadata", () => {
+	it("lets a later step on another instance read a Context saved by an earlier one", async () => {
+		const store = fakeBlobStore();
+		const expiresAt = new Date("2026-12-01T00:00:00.000Z");
+		await store
+			.instance()
+			.addDraft("context_draft", "Draft", "session", expiresAt);
+		await store.instance().promote("context_draft", "Target login");
+
+		const value = await store.instance().read();
+		expect(value.selectedContextId).toBe("context_draft");
+		expect(value.contexts.context_draft).toMatchObject({
+			name: "Target login",
+			status: "saved",
+		});
+		expect(store.puts).toEqual([
+			{ ifMatch: undefined, allowOverwrite: false },
+			{ ifMatch: '"etag-1"', allowOverwrite: true },
+		]);
+	});
+
+	it("rereads and retries instead of losing a write from another instance", async () => {
+		const store = fakeBlobStore();
+		await store.instance().add("context_first", "First");
+		store.writeFromAnotherInstanceAfterNextRead({
+			context_first: saved("First"),
+			context_second: saved("Second"),
+		});
+
+		await store.instance().add("context_third", "Third");
+
+		expect(
+			Object.keys((await store.instance().read()).contexts).sort(),
+		).toEqual(["context_first", "context_second", "context_third"]);
+	});
+
+	it("treats a lost create race as a conflict and keeps both records", async () => {
+		const store = fakeBlobStore();
+		store.writeFromAnotherInstanceAfterNextRead({
+			context_other: saved("Other"),
+		});
+
+		await store.instance().add("context_mine", "Mine");
+
+		expect(
+			Object.keys((await store.instance().read()).contexts).sort(),
+		).toEqual(["context_mine", "context_other"]);
+	});
+
+	it("refuses to overwrite invalid metadata in Blob", async () => {
+		const store = fakeBlobStore();
+		store.blobs.set("benji/contexts.json", {
+			contents: "{broken",
+			etag: '"x"',
+		});
+		await expect(store.instance().add("context_new", "New")).rejects.toThrow(
+			"metadata is invalid",
+		);
+		expect(store.blobs.get("benji/contexts.json")?.contents).toBe("{broken");
+		expect(store.puts).toEqual([]);
 	});
 });
 

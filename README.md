@@ -5,6 +5,8 @@ dealfinder is a personal shopping agent from The Prompting Company, built on
 sellers on the delivered total, checks the merchant's own page, and takes the item as far
 as the payment page. It never pays.
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fpromptingcompany%2Fdealfinder&env=OPENAI_API_KEY,BROWSERBASE_API_KEY,DEALFINDER_OPERATOR_USERNAME,DEALFINDER_OPERATOR_PASSWORD&envDescription=An+OpenAI+key+for+the+model,+a+Browserbase+key+for+the+hosted+browser,+and+the+username+and+password+%28at+least+32+characters%29+that+protect+your+deployment.&envLink=https%3A%2F%2Fgithub.com%2Fpromptingcompany%2Fdealfinder%23keys&project-name=dealfinder&repository-name=dealfinder)
+
 It follows rules drawn from a study of how personal agents shop on live stores:
 
 - Choose the product and the seller separately, and compare sellers on what you pay to
@@ -38,6 +40,22 @@ than a hosted one.
 | `DEALFINDER_OPERATOR_USERNAME`, `DEALFINDER_OPERATOR_PASSWORD` | unset | You expose the app beyond your own machine. The password must be at least 32 bytes. |
 
 [`.env.example`](.env.example) lists every variable.
+
+## Deploy
+
+Click **Deploy with Vercel** above. Vercel copies the repository to your GitHub account
+and asks for four values:
+
+| Variable | What to enter |
+| --- | --- |
+| `OPENAI_API_KEY` | Your OpenAI key. |
+| `BROWSERBASE_API_KEY` | Your Browserbase key. The free plan works. |
+| `DEALFINDER_OPERATOR_USERNAME` | A username for signing in to your deployment. |
+| `DEALFINDER_OPERATOR_PASSWORD` | A password of at least 32 characters. |
+
+Open the deployment, sign in with that username and password, and give it a task. To run
+it against your own store, name the store in the task, for example "Buy the black 24 oz
+bottle from yourstore.com and stop at the payment page."
 
 ## Run locally
 

@@ -34,7 +34,7 @@ beforeEach(async () => {
 	vi.stubEnv("BROWSERBASE_API_KEY", "synthetic-only");
 	vi.stubEnv("BROWSERBASE_CONTEXT_ID", "");
 	vi.stubGlobal("fetch", mocks.fetch);
-	directory = await mkdtemp(path.join(os.tmpdir(), "rick-context-cleanup-"));
+	directory = await mkdtemp(path.join(os.tmpdir(), "benji-context-cleanup-"));
 	store = new metadata.ContextMetadataStore(
 		path.join(directory, "contexts.json"),
 	);

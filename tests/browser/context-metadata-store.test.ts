@@ -18,7 +18,7 @@ let directory: string;
 let filePath: string;
 
 beforeEach(async () => {
-	directory = await mkdtemp(path.join(os.tmpdir(), "rick-context-metadata-"));
+	directory = await mkdtemp(path.join(os.tmpdir(), "benji-context-metadata-"));
 	filePath = path.join(directory, "contexts.json");
 });
 
@@ -160,15 +160,15 @@ describe("browser context metadata", () => {
 describe("default location", () => {
 	it("saves under the temp directory on Vercel, where the code directory is read-only", async () => {
 		vi.stubEnv("VERCEL", "1");
-		vi.stubEnv("RICK_CONTEXT_METADATA_PATH", "");
+		vi.stubEnv("BENJI_CONTEXT_METADATA_PATH", "");
 		const cwd = vi
 			.spyOn(process, "cwd")
 			.mockReturnValue(path.join(directory, "read-only"));
 		const tmpdir = vi.spyOn(os, "tmpdir").mockReturnValue(directory);
 		try {
-			await new ContextMetadataStore().add("ctx_1", "Rick");
+			await new ContextMetadataStore().add("ctx_1", "Benji");
 			const saved = JSON.parse(
-				await readFile(path.join(directory, ".rick", "contexts.json"), "utf8"),
+				await readFile(path.join(directory, ".benji", "contexts.json"), "utf8"),
 			);
 			expect(JSON.stringify(saved)).toContain("ctx_1");
 		} finally {

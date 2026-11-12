@@ -7,11 +7,13 @@ import { Client } from "eve/client";
 import { chromium } from "playwright-core";
 import { restrictBrowserRequests } from "./browser-test-auth.ts";
 
-if (process.env.RICK_LIVE_PARALLEL !== "1" || !process.env.BROWSERBASE_API_KEY)
+if (process.env.BENJI_LIVE_PARALLEL !== "1" || !process.env.BROWSERBASE_API_KEY)
 	throw new Error(
-		"Set RICK_LIVE_PARALLEL=1 and BROWSERBASE_API_KEY for this live test.",
+		"Set BENJI_LIVE_PARALLEL=1 and BROWSERBASE_API_KEY for this live test.",
 	);
-const origin = new URL(process.env.RICK_TEST_ORIGIN || "http://127.0.0.1:4320");
+const origin = new URL(
+	process.env.BENJI_TEST_ORIGIN || "http://127.0.0.1:4320",
+);
 const local =
 	origin.protocol === "http:" &&
 	["127.0.0.1", "localhost"].includes(origin.hostname);
@@ -26,23 +28,23 @@ assert.ok(
 assert.ok(
 	local ||
 		(origin.protocol === "https:" &&
-			origin.origin === process.env.RICK_TEST_STAGING_ORIGIN),
-	"Remote tests require an exact HTTPS RICK_TEST_STAGING_ORIGIN.",
+			origin.origin === process.env.BENJI_TEST_STAGING_ORIGIN),
+	"Remote tests require an exact HTTPS BENJI_TEST_STAGING_ORIGIN.",
 );
-const username = process.env.RICK_OPERATOR_USERNAME,
-	password = process.env.RICK_OPERATOR_PASSWORD;
-const requireAuth = !local || process.env.RICK_TEST_REQUIRE_AUTH === "1";
+const username = process.env.BENJI_OPERATOR_USERNAME,
+	password = process.env.BENJI_OPERATOR_PASSWORD;
+const requireAuth = !local || process.env.BENJI_TEST_REQUIRE_AUTH === "1";
 assert.ok(
 	!requireAuth ||
 		(username &&
 			!username.includes(":") &&
 			password &&
 			Buffer.byteLength(password) >= 32),
-	"Authenticated tests require valid RICK_OPERATOR_USERNAME and RICK_OPERATOR_PASSWORD.",
+	"Authenticated tests require valid BENJI_OPERATOR_USERNAME and BENJI_OPERATOR_PASSWORD.",
 );
-const protection = process.env.RICK_TEST_PROTECTION_BYPASS
+const protection = process.env.BENJI_TEST_PROTECTION_BYPASS
 	? {
-			"x-vercel-protection-bypass": process.env.RICK_TEST_PROTECTION_BYPASS,
+			"x-vercel-protection-bypass": process.env.BENJI_TEST_PROTECTION_BYPASS,
 		}
 	: {};
 const headers = {
@@ -55,7 +57,7 @@ const headers = {
 };
 const secrets = Object.entries({
 	...process.env,
-	RICK_TEST_AUTHORIZATION: headers.authorization,
+	BENJI_TEST_AUTHORIZATION: headers.authorization,
 }).filter(
 	([key, value]) =>
 		/(?:KEY|TOKEN|SECRET|PASSWORD|BYPASS|AUTHORIZATION)$/.test(key) && value,
@@ -75,7 +77,7 @@ const browserbase = new Browserbase({
 	maxRetries: 0,
 });
 const directory = path.resolve(
-	process.env.RICK_TEST_ARTIFACT_DIR || ".rick/parallel-e2e",
+	process.env.BENJI_TEST_ARTIFACT_DIR || ".benji/parallel-e2e",
 	randomUUID(),
 );
 await mkdir(directory, { recursive: true, mode: 0o700 });
@@ -209,7 +211,7 @@ async function workflow(index) {
 			.filter({ hasText: /^Ready$/ })
 			.waitFor();
 		await page
-			.getByLabel("Message Rick", { exact: true })
+			.getByLabel("Message Benji", { exact: true })
 			.fill(
 				`Bounded public research test: use web_search to find official sources about the reserved example.com domain. Use web_fetch to read https://example.com/. Then use run to open https://example.com/ and snapshot to verify its title. Reply with a short summary citing at least one exact URL from each research tool (retain query strings), the observed browser title, and verification marker ${marker}. Use exactly one call to each tool. Do not browse other URLs, access credentials, select saved Contexts, or send messages.`,
 			);
@@ -228,7 +230,7 @@ async function workflow(index) {
 				.locator(".conversation [role=alert]")
 				.waitFor({ timeout: 180_000 })
 				.then(() => {
-					throw new Error("Rick displayed a request error");
+					throw new Error("Benji displayed a request error");
 				}),
 		]);
 		await page

@@ -92,7 +92,7 @@ function loginItem(): Item {
 
 beforeEach(() => {
 	vi.resetAllMocks();
-	vi.stubEnv("RICK_ONEPASSWORD_BACKEND", "");
+	vi.stubEnv("BENJI_ONEPASSWORD_BACKEND", "");
 	vi.stubEnv("OP_SERVICE_ACCOUNT_TOKEN", "fixture-service-token");
 	vi.stubEnv("OP_ACCOUNT", "");
 	sdk.createClient.mockResolvedValue({
@@ -198,7 +198,7 @@ describe("1Password vault", () => {
 		await vault.login("vault-id", "login-id");
 		expect(sdk.createClient).toHaveBeenCalledExactlyOnceWith({
 			auth: "fixture-service-token",
-			integrationName: "Rick",
+			integrationName: "Benji",
 			integrationVersion: "0.1.0",
 		});
 	});
@@ -209,7 +209,7 @@ describe("1Password vault", () => {
 		await new OnePasswordVault().list();
 		expect(sdk.createClient).toHaveBeenCalledWith({
 			auth: expect.objectContaining({ accountName: "Desktop account" }),
-			integrationName: "Rick",
+			integrationName: "Benji",
 			integrationVersion: "0.1.0",
 		});
 	});
@@ -242,7 +242,7 @@ describe("1Password vault", () => {
 	});
 
 	it("rejects an invalid backend before accessing credentials", async () => {
-		vi.stubEnv("RICK_ONEPASSWORD_BACKEND", "automatic");
+		vi.stubEnv("BENJI_ONEPASSWORD_BACKEND", "automatic");
 		await expect(new OnePasswordVault().list()).rejects.toThrow(
 			"must be sdk or cli",
 		);

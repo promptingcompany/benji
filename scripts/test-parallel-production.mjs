@@ -7,9 +7,9 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 
 assert.equal(
-	process.env.RICK_LIVE_PARALLEL,
+	process.env.BENJI_LIVE_PARALLEL,
 	"1",
-	"Set RICK_LIVE_PARALLEL=1 to run this live production-build test.",
+	"Set BENJI_LIVE_PARALLEL=1 to run this live production-build test.",
 );
 for (const name of [
 	"OPENAI_API_KEY",
@@ -17,7 +17,7 @@ for (const name of [
 	"BROWSERBASE_API_KEY",
 ])
 	assert.ok(process.env[name], `${name} is required`);
-const directory = await mkdtemp(path.join(tmpdir(), "rick-production-test-"));
+const directory = await mkdtemp(path.join(tmpdir(), "benji-production-test-"));
 const socket = createServer();
 await new Promise((resolve) => socket.listen(0, "127.0.0.1", resolve));
 const port = socket.address().port;
@@ -26,15 +26,15 @@ const origin = `http://127.0.0.1:${port}`;
 const env = {
 	...process.env,
 	NODE_ENV: "production",
-	RICK_OPERATOR_USERNAME: "regression",
-	RICK_OPERATOR_PASSWORD: randomBytes(32).toString("hex"),
-	RICK_TEST_REQUIRE_AUTH: "1",
-	RICK_TEST_ORIGIN: origin,
-	RICK_CONTEXT_METADATA_PATH: path.join(directory, "contexts.json"),
+	BENJI_OPERATOR_USERNAME: "regression",
+	BENJI_OPERATOR_PASSWORD: randomBytes(32).toString("hex"),
+	BENJI_TEST_REQUIRE_AUTH: "1",
+	BENJI_TEST_ORIGIN: origin,
+	BENJI_CONTEXT_METADATA_PATH: path.join(directory, "contexts.json"),
 	BROWSERBASE_CONTEXT_ID: "",
 	STAGEHAND_BROWSER: "browserbase",
 };
-delete env.RICK_TEST_PROTECTION_BYPASS;
+delete env.BENJI_TEST_PROTECTION_BYPASS;
 const routes = JSON.parse(await readFile(".next/routes-manifest.json", "utf8"));
 const agentOrigin = new URL(
 	routes.rewrites.beforeFiles.find((route) => route.source === "/eve/v1/:path+")

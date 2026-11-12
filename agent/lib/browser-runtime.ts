@@ -317,7 +317,7 @@ export async function saveBrowserContext(
 	if (!contextId) {
 		const created = await createBrowserContext(
 			sessionId,
-			name?.trim() || `Rick ${new Date().toISOString().slice(0, 10)}`,
+			name?.trim() || `Benji ${new Date().toISOString().slice(0, 10)}`,
 			signal,
 		);
 		contextId = created.id;
@@ -370,14 +370,14 @@ function createRuntimeBrowser(
 function defaultContextName(record: { title: string }): string {
 	const title = record.title.trim();
 	if (title && title !== "New task") return title.slice(0, 80);
-	return `Rick ${new Date().toISOString().slice(0, 10)}`;
+	return `Benji ${new Date().toISOString().slice(0, 10)}`;
 }
 
 function scheduleIdleClose(sessionId: string, runtime: BrowserRuntime): void {
 	if (runtime.idleTimer) clearTimeout(runtime.idleTimer);
 	if (runtime.closing || runtimes.get(sessionId) !== runtime) return;
 	const configured = Number(
-		process.env.RICK_BROWSER_IDLE_MS ?? DEFAULT_IDLE_TIMEOUT_MS,
+		process.env.BENJI_BROWSER_IDLE_MS ?? DEFAULT_IDLE_TIMEOUT_MS,
 	);
 	const timeoutMs =
 		Number.isFinite(configured) && configured > 0

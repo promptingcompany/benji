@@ -16,7 +16,7 @@ vi.mock("../../server/browser/vault/onepassword.js", () => ({
 describe("configured vault discovery", () => {
 	beforeEach(() => {
 		vi.clearAllMocks();
-		vi.stubEnv("RICK_VAULT_MASTER_KEY", "");
+		vi.stubEnv("BENJI_VAULT_MASTER_KEY", "");
 		vi.stubEnv("OP_SERVICE_ACCOUNT_TOKEN", "");
 		vi.stubEnv("OP_ACCOUNT", "");
 		mocks.nativeList.mockResolvedValue([
@@ -39,7 +39,7 @@ describe("configured vault discovery", () => {
 	});
 
 	it("discovers native logins without requiring 1Password", async () => {
-		vi.stubEnv("RICK_VAULT_MASTER_KEY", "fixture-key");
+		vi.stubEnv("BENJI_VAULT_MASTER_KEY", "fixture-key");
 		expect(
 			await vaultList.execute({}, {
 				session: { auth: { current: { authenticator: "http-basic" } } },
@@ -51,7 +51,7 @@ describe("configured vault discovery", () => {
 	});
 
 	it("includes provider IDs so the selected login reaches the correct backend", async () => {
-		vi.stubEnv("RICK_VAULT_MASTER_KEY", "fixture-key");
+		vi.stubEnv("BENJI_VAULT_MASTER_KEY", "fixture-key");
 		vi.stubEnv("OP_ACCOUNT", "fixture-account");
 		expect(
 			await vaultList.execute({}, {

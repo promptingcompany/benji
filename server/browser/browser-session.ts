@@ -147,7 +147,7 @@ export class BrowserSession {
 				features = hostedBrowserFeatures();
 				if (this.options.proxyLocation && !features.proxies)
 					throw new Error(
-						"A proxy location needs Browserbase managed proxies. Set RICK_BROWSERBASE_PROXIES=1 (needs a paid Browserbase plan) or start the browser without a location.",
+						"A proxy location needs Browserbase managed proxies. Set BENJI_BROWSERBASE_PROXIES=1 (needs a paid Browserbase plan) or start the browser without a location.",
 					);
 				const currentContextId =
 					this.options.contextId ?? process.env.BROWSERBASE_CONTEXT_ID;
@@ -162,7 +162,7 @@ export class BrowserSession {
 				await this.startBrowserbase(apiKey, features);
 			} else {
 				this.browser = await localBrowser.launch({
-					headless: process.env.RICK_HEADLESS !== "false",
+					headless: process.env.BENJI_HEADLESS !== "false",
 					viewport: { width: 1360, height: 900 },
 				});
 				await this.attachStagehand(this.browser);
@@ -709,7 +709,7 @@ export class BrowserSession {
 				this.state,
 				"system",
 				"browser.replace",
-				"The saved Browserbase session expired. Rick is starting a replacement with the same Context.",
+				"The saved Browserbase session expired. Benji is starting a replacement with the same Context.",
 				{
 					contextPreserved: Boolean(
 						this.options.contextId ?? process.env.BROWSERBASE_CONTEXT_ID,
@@ -755,7 +755,7 @@ export class BrowserSession {
 						this.state,
 						"system",
 						"browser.start.retry",
-						`The Browserbase connection failed. Rick will retry with a new session (${attempt}/3).`,
+						`The Browserbase connection failed. Benji will retry with a new session (${attempt}/3).`,
 						{ attempt, ...features },
 					);
 					await new Promise((resolve) => setTimeout(resolve, attempt * 500));
@@ -1011,7 +1011,7 @@ function safeActivityUrl(value: string): string {
 }
 
 function configuredCaptchaTimeoutMs(): number {
-	const value = Number(process.env.RICK_CAPTCHA_TIMEOUT_MS ?? 30_000);
+	const value = Number(process.env.BENJI_CAPTCHA_TIMEOUT_MS ?? 30_000);
 	return Number.isFinite(value) && value > 0 ? value : 30_000;
 }
 
@@ -1042,8 +1042,8 @@ function withCause(error: unknown): unknown {
 
 export function hostedBrowserFeatures(): HostedBrowserFeatures {
 	return {
-		proxies: settingEnabled(process.env.RICK_BROWSERBASE_PROXIES),
-		verified: settingEnabled(process.env.RICK_BROWSERBASE_VERIFIED),
+		proxies: settingEnabled(process.env.BENJI_BROWSERBASE_PROXIES),
+		verified: settingEnabled(process.env.BENJI_BROWSERBASE_VERIFIED),
 	};
 }
 
@@ -1114,7 +1114,7 @@ export function browserbaseLaunchOptions(
 			...(contextId ? { context: { id: contextId, persist: true } } : {}),
 		},
 		userMetadata: {
-			product: "rick",
+			product: "benji",
 			transport: "stagehand-v4-eve",
 			networkLogging: "false",
 			sessionRecording: "false",

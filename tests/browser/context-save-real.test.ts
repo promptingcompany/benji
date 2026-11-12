@@ -5,7 +5,7 @@ import { BrowserSession } from "../../server/browser/browser-session.js";
 import type { ConversationState } from "../../server/browser/types.js";
 
 const live =
-	process.env.RICK_LIVE_CONTEXT === "1" &&
+	process.env.BENJI_LIVE_CONTEXT === "1" &&
 	Boolean(process.env.BROWSERBASE_API_KEY);
 
 describe("opt-in live Context save", () => {
@@ -14,9 +14,9 @@ describe("opt-in live Context save", () => {
 		async () => {
 			const apiKey = process.env.BROWSERBASE_API_KEY!;
 			const sdk = new Browserbase({ apiKey });
-			const marker = `rick-${Date.now()}`;
+			const marker = `benji-${Date.now()}`;
 			const remote = await sdk.contexts.create({
-				name: `Rick test ${Date.now()}`,
+				name: `Benji test ${Date.now()}`,
 				...(process.env.BROWSERBASE_PROJECT_ID
 					? { projectId: process.env.BROWSERBASE_PROJECT_ID }
 					: {}),
@@ -36,7 +36,7 @@ describe("opt-in live Context save", () => {
 				await writer.importCookies(
 					[
 						{
-							name: "rick_context_test",
+							name: "benji_context_test",
 							value: marker,
 							url: "https://example.com/",
 						},

@@ -1,6 +1,6 @@
 # Test stores
 
-Rick is tested on two small stores built for this purpose, next to real retailers.
+Benji is tested on two small stores built for this purpose, next to real retailers.
 Real stores change every day, so a result on them is hard to repeat. The test stores hold
 everything still except one detail.
 
@@ -74,6 +74,6 @@ Start a new conversation for every prompt, so one answer cannot carry into the n
 
 ## Results so far
 
-h06 on the hosted browser, November 11, 2026, 8 runs: Rick recommended the listing
+h06 on the hosted browser, November 11, 2026, 8 runs: Benji recommended the listing
 with ample stock in 8 of 8 and named stock as the tie-break. The other tests have not
-been run on Rick yet. See [results](results.md).
+been run on Benji yet. See [results](results.md).

@@ -57,7 +57,7 @@ export function issueBrowserHandoffUrl(
 	options: IssueBrowserHandoffOptions = {},
 ): string {
 	const publicUrl = parsePublicUrl(
-		options.publicUrl ?? process.env.RICK_PUBLIC_URL,
+		options.publicUrl ?? process.env.BENJI_PUBLIC_URL,
 	);
 	const token = issueBrowserHandoffToken(target, options);
 	return new URL(`/handoff/${token}`, publicUrl).toString();
@@ -258,7 +258,7 @@ function parsePublicUrl(value?: string): URL {
 }
 
 function handoffKey(value?: string): Buffer {
-	const secret = value ?? process.env.RICK_HANDOFF_SECRET;
+	const secret = value ?? process.env.BENJI_HANDOFF_SECRET;
 	if (!secret || Buffer.byteLength(secret, "utf8") < 32) configurationError();
 	return createHash("sha256").update(secret, "utf8").digest();
 }

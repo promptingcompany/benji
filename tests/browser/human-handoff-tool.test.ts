@@ -32,7 +32,7 @@ describe("human_handoff tool", () => {
 			},
 		});
 		mocks.issueBrowserHandoffUrl.mockReturnValue(
-			"https://rick.example/handoff/opaque-token",
+			"https://benji.example/handoff/opaque-token",
 		);
 	});
 
@@ -55,7 +55,7 @@ describe("human_handoff tool", () => {
 		expect(result).toMatchObject({
 			status: "waiting_for_user",
 			reason: "otp",
-			handoffUrl: "https://rick.example/handoff/opaque-token",
+			handoffUrl: "https://benji.example/handoff/opaque-token",
 			expiresInSeconds: 600,
 		});
 		const action = (result as { action: string }).action;

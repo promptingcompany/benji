@@ -63,7 +63,7 @@ export async function navigateWithMerchantProof(
 	signal: AbortSignal,
 ) {
 	signal.throwIfAborted();
-	const marker = `__rick_merchant_${randomUUID().replaceAll("-", "")}`;
+	const marker = `__benji_merchant_${randomUUID().replaceAll("-", "")}`;
 	let bridge: Awaited<ReturnType<typeof chromium.connectOverCDP>> | undefined;
 	let cdp: CDPSession | undefined;
 	let abort: (() => void) | undefined;

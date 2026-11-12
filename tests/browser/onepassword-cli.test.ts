@@ -44,7 +44,7 @@ const respondWith =
 
 beforeEach(() => {
 	vi.resetAllMocks();
-	vi.stubEnv("RICK_ONEPASSWORD_BACKEND", "cli");
+	vi.stubEnv("BENJI_ONEPASSWORD_BACKEND", "cli");
 	vi.stubEnv("OP_SERVICE_ACCOUNT_TOKEN", "");
 	vi.stubEnv("OP_ACCOUNT", "account-id");
 	mocks.execFile.mockImplementation(
@@ -157,7 +157,7 @@ describe("explicit 1Password CLI compatibility", () => {
 		}
 	});
 
-	it("does not use an ambient CLI account when Rick has no explicit credentials", async () => {
+	it("does not use an ambient CLI account when Benji has no explicit credentials", async () => {
 		vi.stubEnv("OP_ACCOUNT", "");
 		vi.stubEnv("OP_SESSION", "ambient-session");
 		await expect(new OnePasswordVault().list()).rejects.toThrow(

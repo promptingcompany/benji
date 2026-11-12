@@ -1,30 +1,30 @@
 # Baselayer verified identity
 
 Baselayer lets a site confirm a verified person is behind the agent. The credential shares only
-what the site requires, never more. Rick’s `merchant_access` tool gets a short-lived Baselayer KYA
+what the site requires, never more. Benji’s `merchant_access` tool gets a short-lived Baselayer KYA
 credential for the operator and presents it to a compatible merchant inside the conversation’s
 existing Browserbase browser.
 Each conversation keeps its own browser. See the [Baselayer docs](https://docs.baselayer.com) for
 the full protocol.
 
 ```text
-Rick -> merchant KYA profile -> Baselayer mint -> merchant nonce
+Benji -> merchant KYA profile -> Baselayer mint -> merchant nonce
      -> signed proof on one browser GET -> merchant verification -> access result
 ```
 
 ## Configure the sandbox
 
-Set these values in Rick's ignored `.env.local`:
+Set these values in Benji's ignored `.env.local`:
 
 ```dotenv
 BASELAYER_API_KEY=<sandbox API key>
 BASELAYER_PRINCIPAL_REF=<current verified principal from the same organization>
 BASELAYER_ALLOWED_ORIGINS=https://bell-stack-demo-site.vercel.app
-RICK_DEMO_URL=https://bell-stack-demo-site.vercel.app/protected
+BENJI_DEMO_URL=https://bell-stack-demo-site.vercel.app/protected
 STAGEHAND_BROWSER=browserbase
 ```
 
-Keep the OpenAI and Browserbase credentials already used by Rick. Restart Rick and start a new
+Keep the OpenAI and Browserbase credentials already used by Benji. Restart Benji and start a new
 conversation after changing browser logging settings. The browser runtime refuses credential
 presentation if the browser session started with logging enabled.
 
@@ -35,7 +35,7 @@ keypair on the server and sends only its public JWK to Baselayer. The credential
 the merchant’s profile requires. Secrets, private keys, and credentials are not returned in the
 tool result.
 
-Rick runs for one operator. In a multi-user app, verify each user once and use their own principal
+Benji runs for one operator. In a multi-user app, verify each user once and use their own principal
 reference.
 
 Sandbox agent credentials usually expire after about one hour. The returned `expiresAt` or
@@ -74,7 +74,7 @@ directory after testing. This command does not present the credential to a merch
 
 ## Change merchants
 
-Set `RICK_DEMO_URL` to the protected resource and add its exact HTTPS origin to
+Set `BENJI_DEMO_URL` to the protected resource and add its exact HTTPS origin to
 `BASELAYER_ALLOWED_ORIGINS`. A comma-separated list can allow more than one merchant. No wildcards,
 origin paths, or HTTP origins are accepted; tool URLs also reject queries, fragments, and embedded
 credentials.

@@ -47,7 +47,7 @@ const payloadSchema = z.object({
 });
 
 // The v1 file is trusted operator configuration: only credential fields are encrypted.
-// Keep this reader for existing vaults; Rick does not expose vault management routes.
+// Keep this reader for existing vaults; Benji does not expose vault management routes.
 export class NativeVault {
 	constructor(
 		private path?: string,
@@ -101,7 +101,7 @@ export class NativeVault {
 	private async read() {
 		try {
 			const source = await readFile(
-				this.path ?? process.env.RICK_VAULT_FILE ?? ".rick/vault.enc.json",
+				this.path ?? process.env.BENJI_VAULT_FILE ?? ".benji/vault.enc.json",
 				"utf8",
 			);
 			return storeSchema.parse(JSON.parse(source)).records;
@@ -120,7 +120,7 @@ export class NativeVault {
 	}
 
 	private key(): Buffer {
-		const configured = process.env.RICK_VAULT_MASTER_KEY?.trim(),
+		const configured = process.env.BENJI_VAULT_MASTER_KEY?.trim(),
 			key =
 				this.masterKey ??
 				(configured
@@ -131,7 +131,7 @@ export class NativeVault {
 					: undefined);
 		if (!key || key.length !== 32)
 			throw new Error(
-				"Set RICK_VAULT_MASTER_KEY to a 32-byte base64 or 64-character hex key.",
+				"Set BENJI_VAULT_MASTER_KEY to a 32-byte base64 or 64-character hex key.",
 			);
 		return key;
 	}

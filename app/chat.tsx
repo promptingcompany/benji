@@ -173,10 +173,10 @@ export default function Chat({
 
 	function exportConversation() {
 		const text = [
-			"# Rick shopping research",
+			"# Benji shopping research",
 			...messages.map(
 				(message) =>
-					`## ${message.role === "user" ? "You" : "Rick"}\n\n${message.parts
+					`## ${message.role === "user" ? "You" : "Benji"}\n\n${message.parts
 						.filter((part) => part.type === "text")
 						.map((part) => part.text)
 						.join("\n\n")}`,
@@ -187,7 +187,7 @@ export default function Chat({
 		);
 		const link = document.createElement("a");
 		link.href = url;
-		link.download = `rick-shopping-${new Date().toISOString().slice(0, 10)}.md`;
+		link.download = `benji-shopping-${new Date().toISOString().slice(0, 10)}.md`;
 		link.click();
 		URL.revokeObjectURL(url);
 	}
@@ -197,14 +197,14 @@ export default function Chat({
 			<header className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6">
 				<div className="flex items-center gap-2.5">
 					<Image
-						src="/rick.svg"
+						src="/benji.svg"
 						width={36}
 						height={36}
 						alt=""
 						loading="eager"
 					/>
 					<div>
-						<h1 className="text-xl font-semibold tracking-tight">Rick</h1>
+						<h1 className="text-xl font-semibold tracking-tight">Benji</h1>
 						<p className="text-[10px] text-muted-foreground">
 							by The Prompting Company
 						</p>
@@ -268,10 +268,10 @@ export default function Chat({
 							{messages.length === 0 && (
 								<div className="py-8 sm:py-16">
 									<Image
-										src="/rick.svg"
+										src="/benji.svg"
 										width={56}
 										height={56}
-										alt="Rick: a spark inside a circle"
+										alt="Benji: a spark inside a circle"
 										loading="eager"
 										className="mb-6"
 									/>
@@ -320,7 +320,7 @@ export default function Chat({
 											message.role === "user" && "text-right",
 										)}
 									>
-										{message.role === "user" ? "You" : "Rick"}
+										{message.role === "user" ? "You" : "Benji"}
 									</p>
 									<MessageContent
 										className={cn(

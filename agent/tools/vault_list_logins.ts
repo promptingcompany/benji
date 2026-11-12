@@ -13,7 +13,7 @@ export default defineTool({
 		const items = [];
 		if (
 			provider === "native" ||
-			(!provider && process.env.RICK_VAULT_MASTER_KEY?.trim())
+			(!provider && process.env.BENJI_VAULT_MASTER_KEY?.trim())
 		)
 			items.push(...(await nativeVault.list()));
 		if (

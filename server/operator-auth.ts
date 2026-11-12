@@ -21,8 +21,8 @@ export function localOperatorAuth(request: Request) {
 }
 
 function operatorCredentials() {
-	const username = process.env.RICK_OPERATOR_USERNAME?.trim();
-	const password = process.env.RICK_OPERATOR_PASSWORD;
+	const username = process.env.BENJI_OPERATOR_USERNAME?.trim();
+	const password = process.env.BENJI_OPERATOR_PASSWORD;
 	return username &&
 		!username.includes(":") &&
 		password &&
@@ -48,7 +48,7 @@ export const operatorAuth = withAuthChallenges(
 		);
 		return result.ok ? result.sessionAuth : null;
 	},
-	[{ scheme: "Basic", parameters: { realm: "Rick", charset: "UTF-8" } }],
+	[{ scheme: "Basic", parameters: { realm: "Benji", charset: "UTF-8" } }],
 );
 
 function assertOperatorOrigin(request: Request): void {

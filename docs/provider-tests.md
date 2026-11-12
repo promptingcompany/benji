@@ -2,10 +2,10 @@
 
 Run `bun run check` for the normal credential-free checks. Live provider tests are
 opt-in and use real service resources. Keep credentials in ignored environment files.
-Hosted launches request managed proxies only with `RICK_BROWSERBASE_PROXIES` on and
-`verified: true` only with `RICK_BROWSERBASE_VERIFIED` on, including after launch retries.
-The live proxy location test runs only when `RICK_LIVE_PROXY_LOCATION=1` and
-`RICK_BROWSERBASE_PROXIES=1` are both set.
+Hosted launches request managed proxies only with `BENJI_BROWSERBASE_PROXIES` on and
+`verified: true` only with `BENJI_BROWSERBASE_VERIFIED` on, including after launch retries.
+The live proxy location test runs only when `BENJI_LIVE_PROXY_LOCATION=1` and
+`BENJI_BROWSERBASE_PROXIES=1` are both set.
 
 ## Parallel research to browser
 
@@ -13,22 +13,22 @@ Set `OPENAI_API_KEY`, `PARALLEL_API_KEY`, and `BROWSERBASE_API_KEY` in ignored `
 Install Chrome or set `TEST_CHROME_PATH`, then run:
 
 ```sh
-RICK_LIVE_PARALLEL=1 bun run test:parallel:production
+BENJI_LIVE_PARALLEL=1 bun run test:parallel:production
 ```
 
 The runner starts isolated, authenticated production services and checks two concurrent
 conversations, citations, stream recovery, browser handoff, credential non-disclosure, and cleanup.
-Reports stay in ignored `.rick/parallel-e2e/`; failures, including cleanup failures, exit nonzero.
+Reports stay in ignored `.benji/parallel-e2e/`; failures, including cleanup failures, exit nonzero.
 
-For an existing instance, set `RICK_TEST_ORIGIN` and run `RICK_LIVE_PARALLEL=1 bun run test:parallel:live`.
-Remote staging requires the same HTTPS `RICK_TEST_STAGING_ORIGIN`, the deployment's operator
-credentials (password at least 32 bytes), and `RICK_TEST_PROTECTION_BYPASS` if protected.
+For an existing instance, set `BENJI_TEST_ORIGIN` and run `BENJI_LIVE_PARALLEL=1 bun run test:parallel:live`.
+Remote staging requires the same HTTPS `BENJI_TEST_STAGING_ORIGIN`, the deployment's operator
+credentials (password at least 32 bytes), and `BENJI_TEST_PROTECTION_BYPASS` if protected.
 The runner sends credentials only to that exact origin. Local success does not certify staging.
 
 ## 1Password login and OTP
 
 Use a dedicated test vault with a Login item titled exactly
-`Rick integration test (authenticationtest.com)`. Give it the website
+`Benji integration test (authenticationtest.com)`. Give it the website
 `https://authenticationtest.com` and the public test username, password, and OTP seed shown
 on [the test site's TOTP challenge](https://authenticationtest.com/totpChallenge/).
 Do not point the test at a personal or production login.
@@ -37,7 +37,7 @@ Configure `BROWSERBASE_API_KEY` and either `OP_SERVICE_ACCOUNT_TOKEN` or desktop
 through `OP_ACCOUNT`. From the repository root:
 
 ```sh
-RICK_LIVE_ONEPASSWORD=1 STAGEHAND_BROWSER=browserbase \
+BENJI_LIVE_ONEPASSWORD=1 STAGEHAND_BROWSER=browserbase \
   node --env-file-if-exists=.env --env-file-if-exists=.env.local \
   node_modules/vitest/vitest.mjs run tests/browser/onepassword-login-real.test.ts
 ```
@@ -51,7 +51,7 @@ Without the dedicated fixture, report this check as unverified even if vault lis
 With the Browserbase environment loaded, run:
 
 ```sh
-RICK_LIVE_CONTEXT=1 STAGEHAND_BROWSER=browserbase bunx vitest run tests/browser/context-save-real.test.ts
+BENJI_LIVE_CONTEXT=1 STAGEHAND_BROWSER=browserbase bunx vitest run tests/browser/context-save-real.test.ts
 ```
 
 This writes a synthetic example.com cookie, releases the writer, starts a reader with the

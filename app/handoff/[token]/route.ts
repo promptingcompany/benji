@@ -28,7 +28,7 @@ function handoffPage(livePath: string): string {
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-    <title>Rick human handoff</title>
+    <title>Benji human handoff</title>
     <style>
       * { box-sizing: border-box; }
       html, body { height: 100%; margin: 0; }
@@ -42,8 +42,8 @@ function handoffPage(livePath: string): string {
   </head>
   <body>
     <main>
-      <header><h1>Rick needs your help</h1><p>Complete the step, then return to your Rick conversation.</p></header>
-      <iframe src="${livePath}" title="Rick live browser" allow="clipboard-read; clipboard-write"></iframe>
+      <header><h1>Benji needs your help</h1><p>Complete the step, then return to your Benji conversation.</p></header>
+      <iframe src="${livePath}" title="Benji live browser" allow="clipboard-read; clipboard-write"></iframe>
     </main>
   </body>
 </html>`;

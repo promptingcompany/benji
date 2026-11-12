@@ -5,7 +5,7 @@ import { BrowserSession } from "../../server/browser/browser-session.js";
 import type { ConversationState } from "../../server/browser/types.js";
 
 const live =
-	process.env.RICK_LIVE_CAPTCHA === "1" &&
+	process.env.BENJI_LIVE_CAPTCHA === "1" &&
 	Boolean(process.env.BROWSERBASE_API_KEY);
 afterEach(() => vi.unstubAllEnvs());
 describe("opt-in hosted CAPTCHA marker fixture", () => {
@@ -20,7 +20,7 @@ describe("opt-in hosted CAPTCHA marker fixture", () => {
 			const session = new BrowserSession(state);
 			let fixtureBrowser: Browser | undefined;
 			try {
-				const fixture = "https://rick-fixture.invalid/captcha";
+				const fixture = "https://benji-fixture.invalid/captcha";
 				fixtureBrowser = await session.withHostedPage(
 					new AbortController().signal,
 					(_page, connectUrl) => chromium.connectOverCDP(connectUrl),

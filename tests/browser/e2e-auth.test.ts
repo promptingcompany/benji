@@ -11,7 +11,7 @@ async function listen(server: Server) {
 	return `http://127.0.0.1:${address.port}`;
 }
 
-it.runIf(process.env.RICK_TEST_LOCAL_CHROME === "1")(
+it.runIf(process.env.BENJI_TEST_LOCAL_CHROME === "1")(
 	"keeps browser-test credentials on their exact origin across redirects",
 	async () => {
 		const headers = {

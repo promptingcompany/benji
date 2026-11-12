@@ -73,7 +73,7 @@ export interface DurableTaskRecord {
 }
 // Changing this namespace requires retiring conversations from the previous deployment.
 export const taskState = defineState<DurableTaskRecord>(
-	"rick.browser.v1",
+	"benji.browser.v1",
 	() => ({
 		version: 1,
 		taskId: "",
@@ -271,7 +271,7 @@ export function reconcileCaptchaAfterRestart(
 	});
 }
 export function captchaTimeoutMs(): number {
-	const value = Number(process.env.RICK_CAPTCHA_TIMEOUT_MS ?? 30_000);
+	const value = Number(process.env.BENJI_CAPTCHA_TIMEOUT_MS ?? 30_000);
 	return Number.isFinite(value) && value > 0 ? value : 30_000;
 }
 function captchaBlocksGeneric(record: DurableTaskRecord): boolean {

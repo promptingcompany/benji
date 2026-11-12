@@ -1,6 +1,6 @@
 # Browser runtime
 
-Rick's Eve by Vercel agent owns conversation history and tool execution. Browser tools share one in-process
+Benji's Eve by Vercel agent owns conversation history and tool execution. Browser tools share one in-process
 Stagehand runtime per Eve session. Follow-up turns reuse the browser; saved Browserbase session
 metadata supports reconnecting after a worker restart. Hosted launches request keep-alive, a
 one-hour session, and CAPTCHA solving on every attempt. Without the session length a new
@@ -8,41 +8,41 @@ Browserbase project ends the browser after 5 minutes. Managed proxies and Verifi
 settings turn them on, because the Browserbase free plan refuses both.
 
 A launch that Browserbase refuses fails with Browserbase's HTTP status and reason. A refusal
-with a 4xx status other than 429 is a plan, permission, or request problem, so Rick does
-not retry it. Rick makes up to three attempts after a rate limit (429), a server error, or a
+with a 4xx status other than 429 is a plan, permission, or request problem, so Benji does
+not retry it. Benji makes up to three attempts after a rate limit (429), a server error, or a
 connection failure.
 
 `snapshot` reads page text and short-lived targets, `run` performs typed browser actions, and
-`screenshot` captures the page for Rick's viewer. Navigation accepts HTTP and HTTPS URLs without
+`screenshot` captures the page for Benji's viewer. Navigation accepts HTTP and HTTPS URLs without
 embedded credentials. A destination URL cannot change the browser provider. Local fixtures
 require `STAGEHAND_BROWSER=local`.
 
 ## Configuration
 
-Copy the root [`.env.example`](../.env.example) for Rick and integration settings.
+Copy the root [`.env.example`](../.env.example) for Benji and integration settings.
 Hosted browser sessions always disable network logging and recording.
 
 | Variable | Purpose |
 | --- | --- |
 | `STAGEHAND_BROWSER` | `browserbase`, `local`, or `auto`; `auto` uses Browserbase when its API key is present. |
 | `BROWSERBASE_CONTEXT_ID` | Optional existing Context for saved browser state. |
-| `RICK_BROWSERBASE_PROXIES` | `1` or `true` requests Browserbase managed proxies; off by default. Needs a paid Browserbase plan. A proxy location needs this setting, and a browser started with a location fails without it. |
-| `RICK_BROWSERBASE_VERIFIED` | `1` or `true` requests a Browserbase Verified Browser; off by default. Needs the Browserbase Enterprise plan. |
-| `RICK_PUBLIC_URL` | Reachable HTTPS Rick origin for handoff links; loopback HTTP is allowed locally. |
-| `RICK_HANDOFF_SECRET` | Handoff encryption secret, at least 32 bytes. |
-| `RICK_HEADLESS` | Local browser headless mode; defaults to `true`. |
-| `RICK_BROWSER_IDLE_MS` | Browser inactivity timeout; defaults to 30 minutes. |
-| `RICK_CAPTCHA_TIMEOUT_MS` | CAPTCHA wait timeout; defaults to 30 seconds. |
-| `RICK_DRAFT_CONTEXT_TTL_MS` | Unused draft Context lifetime; defaults to seven days. |
-| `RICK_CONTEXT_METADATA_PATH` | Context metadata file; defaults to `.rick/contexts.json`. |
-| `RICK_OPERATOR_USERNAME` / `RICK_OPERATOR_PASSWORD` | Optional HTTP Basic operator credentials for Rick; password must be at least 32 bytes. |
-| `RICK_ONEPASSWORD_BACKEND` | `sdk` (default) or explicitly selected `cli`; there is no automatic fallback between accounts or backends. |
-| `RICK_VAULT_FILE` | Existing encrypted local vault file; defaults to `.rick/vault.enc.json`. |
-| `RICK_VAULT_MASTER_KEY` | Local vault key: 32 bytes encoded as base64 or 64 hexadecimal characters. |
+| `BENJI_BROWSERBASE_PROXIES` | `1` or `true` requests Browserbase managed proxies; off by default. Needs a paid Browserbase plan. A proxy location needs this setting, and a browser started with a location fails without it. |
+| `BENJI_BROWSERBASE_VERIFIED` | `1` or `true` requests a Browserbase Verified Browser; off by default. Needs the Browserbase Enterprise plan. |
+| `BENJI_PUBLIC_URL` | Reachable HTTPS Benji origin for handoff links; loopback HTTP is allowed locally. |
+| `BENJI_HANDOFF_SECRET` | Handoff encryption secret, at least 32 bytes. |
+| `BENJI_HEADLESS` | Local browser headless mode; defaults to `true`. |
+| `BENJI_BROWSER_IDLE_MS` | Browser inactivity timeout; defaults to 30 minutes. |
+| `BENJI_CAPTCHA_TIMEOUT_MS` | CAPTCHA wait timeout; defaults to 30 seconds. |
+| `BENJI_DRAFT_CONTEXT_TTL_MS` | Unused draft Context lifetime; defaults to seven days. |
+| `BENJI_CONTEXT_METADATA_PATH` | Context metadata file; defaults to `.benji/contexts.json`. |
+| `BENJI_OPERATOR_USERNAME` / `BENJI_OPERATOR_PASSWORD` | Optional HTTP Basic operator credentials for Benji; password must be at least 32 bytes. |
+| `BENJI_ONEPASSWORD_BACKEND` | `sdk` (default) or explicitly selected `cli`; there is no automatic fallback between accounts or backends. |
+| `BENJI_VAULT_FILE` | Existing encrypted local vault file; defaults to `.benji/vault.enc.json`. |
+| `BENJI_VAULT_MASTER_KEY` | Local vault key: 32 bytes encoded as base64 or 64 hexadecimal characters. |
 
 The HTTP channel also supports Vercel OIDC. Unauthenticated development access is restricted
 to loopback hosts. Production deployments must protect the web interface and session routes.
-Never commit credentials, `.env` files, or `.rick` data. Keep the handoff secret
+Never commit credentials, `.env` files, or `.benji` data. Keep the handoff secret
 stable across restarts.
 
 ## Updating an existing deployment
@@ -53,17 +53,17 @@ version and verify their Browserbase sessions are released. Start new conversati
 do not resume sessions created by the previous version.
 
 Use the variable names in the table above; old configuration names are no longer read.
-To preserve saved Context labels, move the previous metadata file to `.rick/contexts.json`,
-or set `RICK_CONTEXT_METADATA_PATH` to its existing location. The file format is unchanged.
-To retain an existing local vault, move its encrypted file to `.rick/vault.enc.json` or set
-`RICK_VAULT_FILE` to its location, and copy the existing key into `RICK_VAULT_MASTER_KEY`.
+To preserve saved Context labels, move the previous metadata file to `.benji/contexts.json`,
+or set `BENJI_CONTEXT_METADATA_PATH` to its existing location. The file format is unchanged.
+To retain an existing local vault, move its encrypted file to `.benji/vault.enc.json` or set
+`BENJI_VAULT_FILE` to its location, and copy the existing key into `BENJI_VAULT_MASTER_KEY`.
 The encrypted file format is unchanged. Existing CLI users must explicitly select the CLI
 backend and configure its account as described below; SDK failures no longer switch backends.
 
 ## Contexts and storage
 
 Browserbase Contexts preserve cookies and site state; they do not store vault secrets. Hosted
-tasks get a draft Context. Rick's `context_save` tool names and retains it, and `context_list`,
+tasks get a draft Context. Benji's `context_save` tool names and retains it, and `context_list`,
 `context_create`, and `context_select` manage saved browser identities. Select a separate Context
 for each identity or work boundary.
 
@@ -83,7 +83,7 @@ For hosted 1Password access, set `OP_SERVICE_ACCOUNT_TOKEN` with access only to 
 For local use, enable SDK integration in the 1Password desktop app and set `OP_ACCOUNT` to the
 account name shown in its sidebar. Service-account mode takes precedence over desktop access.
 
-Existing 1Password CLI setups can set `RICK_ONEPASSWORD_BACKEND=cli`. Install `op` and use an
+Existing 1Password CLI setups can set `BENJI_ONEPASSWORD_BACKEND=cli`. Install `op` and use an
 explicit `OP_ACCOUNT` account UUID or sign-in address, or the scoped service token above. An
 account UUID is accepted by both backends. CLI commands never use an implicit last-used account
 or ambient Connect/session credentials, and SDK errors do not trigger a CLI fallback.
@@ -102,10 +102,10 @@ submission, including an OTP step after navigation. Credential selectors must ta
 iframe and XPath selectors are rejected. A success selector is required to verify login.
 Persisted sessions with unverified logging settings are replaced before automation resumes.
 TOTP values resolve server-side. When a login needs an unavailable OTP, passkey, or human approval,
-use `human_handoff`, complete the challenge in Live View, and reply in the original Rick conversation.
+use `human_handoff`, complete the challenge in Live View, and reply in the original Benji conversation.
 
 Handoff links expire after ten minutes by default and are not single-use. Expiry prevents opening
 the link again; it does not revoke a Browserbase Live View already opened. That view can remain
 usable until the browser session ends. Keep both URLs private and close the conversation when done.
-The reachable Rick origin and handoff secret must be configured before issuing a link.
+The reachable Benji origin and handoff secret must be configured before issuing a link.
 See [provider checks](provider-tests.md) for opt-in login and saved-Context regressions.

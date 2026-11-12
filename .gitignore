@@ -1,7 +1,7 @@
 node_modules/
 .next/
 .eve/
-.rick/
+.benji/
 contexts.json
 *.enc.json
 .output/

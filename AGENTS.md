@@ -1,4 +1,4 @@
-# dealfinder
+# Rick
 
 Read `README.md` and `UPSTREAM.md` before changing this app.
 

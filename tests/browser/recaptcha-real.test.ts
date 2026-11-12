@@ -4,7 +4,7 @@ import { BrowserSession } from "../../server/browser/browser-session.js";
 import type { ConversationState } from "../../server/browser/types.js";
 
 const live =
-	process.env.DEALFINDER_REAL_CAPTCHA === "1" &&
+	process.env.RICK_REAL_CAPTCHA === "1" &&
 	Boolean(process.env.BROWSERBASE_API_KEY);
 
 describe("opt-in real Browserbase CAPTCHA solve", () => {

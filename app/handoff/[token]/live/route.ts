@@ -32,7 +32,7 @@ export async function GET(
 			{
 				error:
 					status === 410
-						? "This handoff link expired. Ask dealfinder for a new link."
+						? "This handoff link expired. Ask Rick for a new link."
 						: "The live browser is not available.",
 			},
 			{

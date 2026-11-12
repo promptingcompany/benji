@@ -109,7 +109,7 @@ export async function ensureAgentContext(
 	}
 
 	await deleteExpiredDraftContexts(now);
-	const name = `dealfinder draft ${shortSessionId(ownerSessionId)}`;
+	const name = `Rick draft ${shortSessionId(ownerSessionId)}`;
 	const remote = await sdk.contexts.create({
 		name,
 		...(process.env.BROWSERBASE_PROJECT_ID
@@ -200,7 +200,7 @@ async function deleteContext(id: string): Promise<void> {
 }
 
 function draftTtlMs(): number {
-	const configured = Number(process.env.DEALFINDER_DRAFT_CONTEXT_TTL_MS);
+	const configured = Number(process.env.RICK_DRAFT_CONTEXT_TTL_MS);
 	return Number.isFinite(configured) && configured > 0
 		? configured
 		: DEFAULT_DRAFT_TTL_MS;

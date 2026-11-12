@@ -112,7 +112,7 @@ export class OnePasswordVault {
 					const sdk = await import("@1password/sdk");
 					return await sdk.createClient({
 						auth: token || new sdk.DesktopAuth(account!),
-						integrationName: "dealfinder",
+						integrationName: "Rick",
 						integrationVersion: "0.1.0",
 					});
 				} catch {
@@ -130,9 +130,9 @@ export class OnePasswordVault {
 export const onePasswordVault = new OnePasswordVault();
 
 function backend(): "sdk" | "cli" {
-	const value = process.env.DEALFINDER_ONEPASSWORD_BACKEND?.trim() || "sdk";
+	const value = process.env.RICK_ONEPASSWORD_BACKEND?.trim() || "sdk";
 	if (value !== "sdk" && value !== "cli")
-		throw new Error("DEALFINDER_ONEPASSWORD_BACKEND must be sdk or cli.");
+		throw new Error("RICK_ONEPASSWORD_BACKEND must be sdk or cli.");
 	return value;
 }
 

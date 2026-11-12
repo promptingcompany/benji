@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { operatorAuth } from "../../server/operator-auth";
 
 const password = "synthetic-operator-password-at-least-32-bytes";
-const origin = "https://dealfinder.example";
+const origin = "https://rick.example";
 const authorization = `Basic ${Buffer.from(`operator:${password}`).toString("base64")}`;
 
 function request(path: string, init: RequestInit = {}) {
@@ -14,8 +14,8 @@ function request(path: string, init: RequestInit = {}) {
 }
 
 beforeEach(() => {
-	vi.stubEnv("DEALFINDER_OPERATOR_USERNAME", "operator");
-	vi.stubEnv("DEALFINDER_OPERATOR_PASSWORD", password);
+	vi.stubEnv("RICK_OPERATOR_USERNAME", "operator");
+	vi.stubEnv("RICK_OPERATOR_PASSWORD", password);
 });
 
 afterEach(() => vi.unstubAllEnvs());
@@ -25,7 +25,7 @@ describe("operator authentication", () => {
 		"",
 		"short",
 	])("fails closed with an absent or weak operator password", (value) => {
-		vi.stubEnv("DEALFINDER_OPERATOR_PASSWORD", value);
+		vi.stubEnv("RICK_OPERATOR_PASSWORD", value);
 		expect(operatorAuth(request("/"))).toBeNull();
 	});
 

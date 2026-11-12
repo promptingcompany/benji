@@ -35,11 +35,11 @@ async function withEveContext(check: () => Promise<void>) {
 	});
 }
 
-describe("dealfinder's shared browser runtime", () => {
-	it("redacts form values and preserves the browser identity through dealfinder's actual import", () =>
+describe("Rick's shared browser runtime", () => {
+	it("redacts form values and preserves the browser identity through Rick's actual import", () =>
 		withEveContext(async () => {
 			vi.stubEnv(
-				"DEALFINDER_HANDOFF_SECRET",
+				"RICK_HANDOFF_SECRET",
 				"synthetic-shared-handoff-secret-at-least-32-bytes",
 			);
 			const fill = vi.fn(async () => {});
@@ -86,7 +86,7 @@ describe("dealfinder's shared browser runtime", () => {
 			expect(output.workbench.browser).not.toHaveProperty("liveViewToken");
 		}));
 
-	it("does not recreate dealfinder's runtime when canceled before queued work starts", () =>
+	it("does not recreate Rick's runtime when canceled before queued work starts", () =>
 		withEveContext(async () => {
 			const controller = new AbortController();
 			const pending = run.execute(
@@ -97,7 +97,7 @@ describe("dealfinder's shared browser runtime", () => {
 			await expect(pending).rejects.toMatchObject({ name: "AbortError" });
 			expect(hasBrowserRuntime(sessionId)).toBe(false);
 		}));
-	it("shares one runtime across dealfinder's tool and lifecycle imports", () =>
+	it("shares one runtime across Rick's tool and lifecycle imports", () =>
 		withEveContext(async () => {
 			const result = { completed: 1, url: "https://example.com/" };
 			const runBrowser = vi.fn().mockResolvedValue(result);
@@ -127,7 +127,7 @@ describe("dealfinder's shared browser runtime", () => {
 			expect(hasBrowserRuntime(sessionId)).toBe(false);
 		}));
 
-	it("closes the shared runtime when dealfinder passes an already canceled signal", () =>
+	it("closes the shared runtime when Rick passes an already canceled signal", () =>
 		withEveContext(async () => {
 			const runBrowser = vi.fn();
 			const closeBrowser = vi.fn().mockResolvedValue(undefined);

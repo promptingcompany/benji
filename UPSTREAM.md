@@ -1,6 +1,6 @@
 # Upstream
 
-dealfinder's browser runtime is adapted from Browserbase BELL.
+Rick's browser runtime is adapted from Browserbase BELL.
 
 - Source: https://github.com/browserbase/bell-stack
 - Commit: `ae8bd1f8adb95f8b27f3263b5527858fbe719b11`
@@ -11,10 +11,10 @@ dealfinder's browser runtime is adapted from Browserbase BELL.
 
 The browser session lifecycle, the browser tools (`run`, `snapshot`, `screenshot`),
 reusable Browserbase Contexts, human handoff, the operator credential vault, Baselayer
-merchant access, the Parallel search tools, and the tests for each. dealfinder does not
+merchant access, the Parallel search tools, and the tests for each. Rick does not
 include BELL's messaging, payment, or monitoring integrations.
 
-## What dealfinder adds
+## What Rick adds
 
 The shopping identity and rules in `agent/instructions.md` and
 `agent/skills/shopping-research/SKILL.md`, the `compare_offers` tool, the shopping web

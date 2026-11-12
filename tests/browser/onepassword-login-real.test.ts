@@ -5,7 +5,7 @@ import type { ConversationState } from "../../server/browser/types.js";
 import { onePasswordVault } from "../../server/browser/vault/onepassword.js";
 
 const live =
-	process.env.DEALFINDER_LIVE_ONEPASSWORD === "1" &&
+	process.env.RICK_LIVE_ONEPASSWORD === "1" &&
 	Boolean(process.env.BROWSERBASE_API_KEY) &&
 	Boolean(process.env.OP_SERVICE_ACCOUNT_TOKEN || process.env.OP_ACCOUNT);
 
@@ -17,7 +17,7 @@ describe("opt-in live 1Password login", () => {
 				item = items.find(
 					(candidate) =>
 						candidate.label ===
-							"dealfinder integration test (authenticationtest.com)" &&
+							"Rick integration test (authenticationtest.com)" &&
 						candidate.allowedHosts.includes("authenticationtest.com"),
 				);
 			expect(item).toBeDefined();

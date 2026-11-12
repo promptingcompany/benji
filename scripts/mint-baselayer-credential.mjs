@@ -9,7 +9,7 @@ try {
 	if (args.length !== 1)
 		throw new Error("Usage: bun run baselayer:mint <merchant-url>");
 	const minted = await mintBaselayerCredential(args[0]);
-	directory = await mkdtemp(join(tmpdir(), "dealfinder-baselayer-"));
+	directory = await mkdtemp(join(tmpdir(), "rick-baselayer-"));
 	await writeFile(join(directory, "credential.txt"), minted.credential, {
 		mode: 0o600,
 	});

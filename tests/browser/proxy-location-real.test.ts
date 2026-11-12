@@ -7,7 +7,7 @@ import {
 import type { ConversationState } from "../../server/browser/types.js";
 
 const live =
-	process.env.DEALFINDER_LIVE_PROXY_LOCATION === "1" &&
+	process.env.RICK_LIVE_PROXY_LOCATION === "1" &&
 	hostedBrowserFeatures().proxies &&
 	Boolean(process.env.BROWSERBASE_API_KEY);
 

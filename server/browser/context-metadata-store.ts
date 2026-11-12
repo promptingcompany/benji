@@ -155,18 +155,18 @@ export class ContextMetadataStore {
 }
 
 declare global {
-	var __dealfinderContextMetadataStore: ContextMetadataStore | undefined;
+	var __rickContextMetadataStore: ContextMetadataStore | undefined;
 }
 
 export function getContextMetadataStore(): ContextMetadataStore {
-	globalThis.__dealfinderContextMetadataStore ??= new ContextMetadataStore();
-	return globalThis.__dealfinderContextMetadataStore;
+	globalThis.__rickContextMetadataStore ??= new ContextMetadataStore();
+	return globalThis.__rickContextMetadataStore;
 }
 
 function defaultMetadataPath(): string {
-	return process.env.DEALFINDER_CONTEXT_METADATA_PATH
-		? path.resolve(process.env.DEALFINDER_CONTEXT_METADATA_PATH)
-		: path.join(writableRoot(), ".dealfinder", "contexts.json");
+	return process.env.RICK_CONTEXT_METADATA_PATH
+		? path.resolve(process.env.RICK_CONTEXT_METADATA_PATH)
+		: path.join(writableRoot(), ".rick", "contexts.json");
 }
 
 // Vercel functions can only write under /tmp; the deployed code directory is read-only.

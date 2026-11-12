@@ -1,11 +1,11 @@
-# dealfinder
+# Rick
 
-dealfinder is a personal shopping agent from The Prompting Company, built on
+Rick is a personal shopping agent from The Prompting Company, built on
 [Eve](https://eve.dev/docs). Give it a purchase, a budget and a postcode. It compares
 sellers on the delivered total, checks the merchant's own page, and takes the item as far
 as the payment page. It never pays.
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fpromptingcompany%2Fdealfinder&env=OPENAI_API_KEY,BROWSERBASE_API_KEY,DEALFINDER_OPERATOR_USERNAME,DEALFINDER_OPERATOR_PASSWORD&envDescription=An+OpenAI+key+for+the+model,+a+Browserbase+key+for+the+hosted+browser,+and+the+username+and+password+%28at+least+32+characters%29+that+protect+your+deployment.&envLink=https%3A%2F%2Fgithub.com%2Fpromptingcompany%2Fdealfinder%23keys&project-name=dealfinder&repository-name=dealfinder)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fpromptingcompany%2Fdealfinder&env=OPENAI_API_KEY,BROWSERBASE_API_KEY,RICK_OPERATOR_USERNAME,RICK_OPERATOR_PASSWORD&envDescription=An+OpenAI+key+for+the+model,+a+Browserbase+key+for+the+hosted+browser,+and+the+username+and+password+%28at+least+32+characters%29+that+protect+your+deployment.&envLink=https%3A%2F%2Fgithub.com%2Fpromptingcompany%2Fdealfinder%23keys&project-name=rick&repository-name=rick)
 
 It follows rules drawn from a study of how personal agents shop on live stores:
 
@@ -27,17 +27,17 @@ Two keys run the full agent. Everything else is optional and off by default.
 | `BROWSERBASE_API_KEY` | For hosted browsers | Opens the store pages in a hosted browser. | [browserbase.com](https://www.browserbase.com) |
 | `PARALLEL_API_KEY` | Optional | Adds public web search before the browser opens a page. | [parallel.ai](https://parallel.ai) |
 
-To try it with one key, set `STAGEHAND_BROWSER=local`. dealfinder then drives Chrome on
+To try it with one key, set `STAGEHAND_BROWSER=local`. Rick then drives Chrome on
 your machine and needs only `OPENAI_API_KEY`. Some stores block a local browser sooner
 than a hosted one.
 
 | Setting | Default | Change it when |
 | --- | --- | --- |
 | `STAGEHAND_BROWSER` | `browserbase` | Set `local` to use your own Chrome. |
-| `DEALFINDER_MODEL` | `gpt-5.6-sol` | Your OpenAI account uses a different model. |
-| `DEALFINDER_BROWSERBASE_PROXIES` | off | Set `1` for Browserbase managed proxies. Needs a paid Browserbase plan. |
-| `DEALFINDER_BROWSERBASE_VERIFIED` | off | Set `1` for Browserbase Verified Browsers. Needs the Enterprise plan. |
-| `DEALFINDER_OPERATOR_USERNAME`, `DEALFINDER_OPERATOR_PASSWORD` | unset | You expose the app beyond your own machine. The password must be at least 32 bytes. |
+| `RICK_MODEL` | `gpt-5.6-sol` | Your OpenAI account uses a different model. |
+| `RICK_BROWSERBASE_PROXIES` | off | Set `1` for Browserbase managed proxies. Needs a paid Browserbase plan. |
+| `RICK_BROWSERBASE_VERIFIED` | off | Set `1` for Browserbase Verified Browsers. Needs the Enterprise plan. |
+| `RICK_OPERATOR_USERNAME`, `RICK_OPERATOR_PASSWORD` | unset | You expose the app beyond your own machine. The password must be at least 32 bytes. |
 
 [`.env.example`](.env.example) lists every variable.
 
@@ -50,8 +50,8 @@ and asks for four values:
 | --- | --- |
 | `OPENAI_API_KEY` | Your OpenAI key. |
 | `BROWSERBASE_API_KEY` | Your Browserbase key. The free plan works. |
-| `DEALFINDER_OPERATOR_USERNAME` | A username for signing in to your deployment. |
-| `DEALFINDER_OPERATOR_PASSWORD` | A password of at least 32 characters. |
+| `RICK_OPERATOR_USERNAME` | A username for signing in to your deployment. |
+| `RICK_OPERATOR_PASSWORD` | A password of at least 32 characters. |
 
 Open the deployment, sign in with that username and password, and give it a task. To run
 it against your own store, name the store in the task, for example "Buy the black 24 oz
@@ -60,7 +60,7 @@ bottle from yourstore.com and stop at the payment page."
 ## Run locally
 
 You need Node.js 24, Bun 1.4.4, Chrome, and a running Docker daemon for Eve's local
-sandbox. dealfinder needs no database.
+sandbox. Rick needs no database.
 
 ```sh
 bun install
@@ -87,7 +87,7 @@ conversation can take a few minutes while Eve prepares its sandbox.
 > to California. Compare comfort, battery life, exact variants, current offers,
 > returns, and total cost. Recommend one and explain what you could not verify.
 
-Asked to buy, dealfinder goes as far as the payment page as a guest. It asks for a name,
+Asked to buy, Rick goes as far as the payment page as a guest. It asks for a name,
 email and address instead of inventing them. The `compare_offers` tool does the totals, so
 an offer with unknown shipping or tax is never ranked as cheapest.
 
@@ -99,12 +99,12 @@ visible messages, not tool events or screenshots.
 
 ## Results
 
-On five shopping tasks on live stores, dealfinder reached the payment page in 4 of 5 with
+On five shopping tasks on live stores, Rick reached the payment page in 4 of 5 with
 the hosted browser. See [results](docs/results.md) for every task and the stock test.
 
 ## Test stores
 
-dealfinder is tested on real retailers and on two purpose-built stores where one detail
+Rick is tested on real retailers and on two purpose-built stores where one detail
 changes at a time. See [test stores](docs/test-stores.md) for the stores, the tests and
 the results so far.
 
@@ -133,6 +133,6 @@ See [provider checks](docs/provider-tests.md) for explicit live checks.
 
 ## Credits
 
-dealfinder's browser runtime and integrations are adapted from
+Rick's browser runtime and integrations are adapted from
 [Browserbase BELL](https://github.com/browserbase/bell-stack) under the MIT licence. See
 [UPSTREAM.md](UPSTREAM.md) and [LICENSE](LICENSE).

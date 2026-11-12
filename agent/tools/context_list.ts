@@ -5,7 +5,7 @@ import { listAgentContexts } from "../../server/browser/agent-contexts";
 
 export default defineTool({
 	description:
-		"List reusable Browserbase Contexts that dealfinder can select for a later browser task. Context IDs are safe metadata, not credentials.",
+		"List reusable Browserbase Contexts that Rick can select for a later browser task. Context IDs are safe metadata, not credentials.",
 	inputSchema: z.object({}),
 	async execute() {
 		const contexts = await listAgentContexts();

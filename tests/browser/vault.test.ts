@@ -11,7 +11,7 @@ import { generateTotp } from "../../server/browser/vault/totp";
 const directories: string[] = [];
 const masterKey = Buffer.alloc(32, 7);
 async function fixture() {
-	const directory = await mkdtemp(join(tmpdir(), "dealfinder-vault-")),
+	const directory = await mkdtemp(join(tmpdir(), "rick-vault-")),
 		path = join(directory, "vault.json");
 	directories.push(directory);
 	await copyFile(
@@ -81,10 +81,10 @@ describe("existing local encrypted vaults", () => {
 	it.each([
 		"base64",
 		"hex",
-	] as const)("uses dealfinder configuration with a %s master key", async (encoding) => {
+	] as const)("uses Rick configuration with a %s master key", async (encoding) => {
 		const { path } = await fixture();
-		vi.stubEnv("DEALFINDER_VAULT_FILE", path);
-		vi.stubEnv("DEALFINDER_VAULT_MASTER_KEY", masterKey.toString(encoding));
+		vi.stubEnv("RICK_VAULT_FILE", path);
+		vi.stubEnv("RICK_VAULT_MASTER_KEY", masterKey.toString(encoding));
 		await expect(
 			new NativeVault().login("fixture-login"),
 		).resolves.toMatchObject({
@@ -103,10 +103,10 @@ describe("existing local encrypted vaults", () => {
 	it("rejects missing or malformed master keys", async () => {
 		const { path } = await fixture();
 		for (const key of ["", "too-short"]) {
-			vi.stubEnv("DEALFINDER_VAULT_MASTER_KEY", key);
+			vi.stubEnv("RICK_VAULT_MASTER_KEY", key);
 			await expect(
 				new NativeVault(path).login("fixture-login"),
-			).rejects.toThrow("Set DEALFINDER_VAULT_MASTER_KEY");
+			).rejects.toThrow("Set RICK_VAULT_MASTER_KEY");
 		}
 	});
 

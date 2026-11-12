@@ -2,22 +2,20 @@ import assert from "node:assert/strict";
 import Browserbase from "@browserbasehq/sdk";
 import { Client } from "eve/client";
 
-// Opt-in: requires a running local dealfinder and uses the configured model/browser.
+// Opt-in: requires a running local Rick and uses the configured model/browser.
 if (
-	process.env.DEALFINDER_LIVE_RETIREMENT !== "1" ||
+	process.env.RICK_LIVE_RETIREMENT !== "1" ||
 	!process.env.BROWSERBASE_API_KEY
 )
 	throw new Error(
-		"Set DEALFINDER_LIVE_RETIREMENT=1 and BROWSERBASE_API_KEY for this live test.",
+		"Set RICK_LIVE_RETIREMENT=1 and BROWSERBASE_API_KEY for this live test.",
 	);
-const origin = new URL(
-	process.env.DEALFINDER_TEST_ORIGIN || "http://127.0.0.1:4320",
-);
+const origin = new URL(process.env.RICK_TEST_ORIGIN || "http://127.0.0.1:4320");
 if (
 	origin.protocol !== "http:" ||
 	!["127.0.0.1", "localhost"].includes(origin.hostname)
 )
-	throw new Error("This test accepts only a local dealfinder origin.");
+	throw new Error("This test accepts only a local Rick origin.");
 const client = new Client({ host: origin.origin });
 const browserbase = new Browserbase({
 	apiKey: process.env.BROWSERBASE_API_KEY,

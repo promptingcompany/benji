@@ -8,7 +8,7 @@ import {
 
 export default defineTool({
 	description:
-		"Capture the visible page when layout, images, or visual state are important. dealfinder's web chat shows the image in its browser preview.",
+		"Capture the visible page when layout, images, or visual state are important. Rick's web chat shows the image in its browser preview.",
 	inputSchema: z.object({}),
 	async execute(_input, ctx) {
 		return runCancelableBrowserWork(ctx.session.id, ctx.abortSignal, () =>

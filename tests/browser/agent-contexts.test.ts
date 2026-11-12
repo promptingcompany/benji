@@ -26,7 +26,7 @@ describe("saved browser contexts", () => {
 		vi.stubEnv("BROWSERBASE_API_KEY", "synthetic-test-key");
 		vi.stubEnv("BROWSERBASE_CONTEXT_ID", "");
 		const directory = await mkdtemp(
-			path.join(os.tmpdir(), "dealfinder-context-test-"),
+			path.join(os.tmpdir(), "rick-context-test-"),
 		);
 		const metadata = new metadataStore.ContextMetadataStore(
 			path.join(directory, "contexts.json"),

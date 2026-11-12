@@ -42,8 +42,8 @@ function hostedLaunch(
 	vi.useFakeTimers();
 	vi.stubEnv("STAGEHAND_BROWSER", "browserbase");
 	vi.stubEnv("BROWSERBASE_API_KEY", "test-key");
-	vi.stubEnv("DEALFINDER_BROWSERBASE_PROXIES", "");
-	vi.stubEnv("DEALFINDER_BROWSERBASE_VERIFIED", "");
+	vi.stubEnv("RICK_BROWSERBASE_PROXIES", "");
+	vi.stubEnv("RICK_BROWSERBASE_VERIFIED", "");
 	const launch = vi.spyOn(browserbase, "launch");
 	const state: ConversationState = {
 		id: "hosted-launch-test",
@@ -134,18 +134,12 @@ describe("shared hosted-page integration boundary", () => {
 
 	it.each([
 		[{}, { proxies: false, verified: false }],
-		[
-			{ DEALFINDER_BROWSERBASE_PROXIES: "1" },
-			{ proxies: true, verified: false },
-		],
-		[
-			{ DEALFINDER_BROWSERBASE_VERIFIED: "true" },
-			{ proxies: false, verified: true },
-		],
+		[{ RICK_BROWSERBASE_PROXIES: "1" }, { proxies: true, verified: false }],
+		[{ RICK_BROWSERBASE_VERIFIED: "true" }, { proxies: false, verified: true }],
 		[
 			{
-				DEALFINDER_BROWSERBASE_PROXIES: "yes",
-				DEALFINDER_BROWSERBASE_VERIFIED: "0",
+				RICK_BROWSERBASE_PROXIES: "yes",
+				RICK_BROWSERBASE_VERIFIED: "0",
 			},
 			{ proxies: false, verified: false },
 		],
@@ -175,7 +169,7 @@ describe("shared hosted-page integration boundary", () => {
 	it("passes a proxy location only when managed proxies are on", async () => {
 		const location = { country: "US", state: "CA" };
 		const { launch, session } = hostedLaunch({ proxyLocation: location });
-		vi.stubEnv("DEALFINDER_BROWSERBASE_PROXIES", "1");
+		vi.stubEnv("RICK_BROWSERBASE_PROXIES", "1");
 		launch.mockRejectedValue(new Error("stop after the request"));
 		const failure = expect(session.start()).rejects.toThrow();
 		await vi.runAllTimersAsync();
@@ -191,16 +185,14 @@ describe("shared hosted-page integration boundary", () => {
 			proxyLocation: { country: "US" },
 			ensureContext,
 		});
-		await expect(session.start()).rejects.toThrow(
-			"DEALFINDER_BROWSERBASE_PROXIES",
-		);
+		await expect(session.start()).rejects.toThrow("RICK_BROWSERBASE_PROXIES");
 		expect(ensureContext).not.toHaveBeenCalled();
 		expect(launch).not.toHaveBeenCalled();
 	});
 
 	it("reports a plan refusal with Browserbase's reason and does not retry it", async () => {
 		const { launch, session } = hostedLaunch();
-		vi.stubEnv("DEALFINDER_BROWSERBASE_PROXIES", "1");
+		vi.stubEnv("RICK_BROWSERBASE_PROXIES", "1");
 		vi.stubGlobal(
 			"fetch",
 			vi.fn(async () =>

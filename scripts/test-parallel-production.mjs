@@ -7,9 +7,9 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 
 assert.equal(
-	process.env.DEALFINDER_LIVE_PARALLEL,
+	process.env.RICK_LIVE_PARALLEL,
 	"1",
-	"Set DEALFINDER_LIVE_PARALLEL=1 to run this live production-build test.",
+	"Set RICK_LIVE_PARALLEL=1 to run this live production-build test.",
 );
 for (const name of [
 	"OPENAI_API_KEY",
@@ -17,9 +17,7 @@ for (const name of [
 	"BROWSERBASE_API_KEY",
 ])
 	assert.ok(process.env[name], `${name} is required`);
-const directory = await mkdtemp(
-	path.join(tmpdir(), "dealfinder-production-test-"),
-);
+const directory = await mkdtemp(path.join(tmpdir(), "rick-production-test-"));
 const socket = createServer();
 await new Promise((resolve) => socket.listen(0, "127.0.0.1", resolve));
 const port = socket.address().port;
@@ -28,15 +26,15 @@ const origin = `http://127.0.0.1:${port}`;
 const env = {
 	...process.env,
 	NODE_ENV: "production",
-	DEALFINDER_OPERATOR_USERNAME: "regression",
-	DEALFINDER_OPERATOR_PASSWORD: randomBytes(32).toString("hex"),
-	DEALFINDER_TEST_REQUIRE_AUTH: "1",
-	DEALFINDER_TEST_ORIGIN: origin,
-	DEALFINDER_CONTEXT_METADATA_PATH: path.join(directory, "contexts.json"),
+	RICK_OPERATOR_USERNAME: "regression",
+	RICK_OPERATOR_PASSWORD: randomBytes(32).toString("hex"),
+	RICK_TEST_REQUIRE_AUTH: "1",
+	RICK_TEST_ORIGIN: origin,
+	RICK_CONTEXT_METADATA_PATH: path.join(directory, "contexts.json"),
 	BROWSERBASE_CONTEXT_ID: "",
 	STAGEHAND_BROWSER: "browserbase",
 };
-delete env.DEALFINDER_TEST_PROTECTION_BYPASS;
+delete env.RICK_TEST_PROTECTION_BYPASS;
 const routes = JSON.parse(await readFile(".next/routes-manifest.json", "utf8"));
 const agentOrigin = new URL(
 	routes.rewrites.beforeFiles.find((route) => route.source === "/eve/v1/:path+")

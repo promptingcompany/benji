@@ -7,10 +7,10 @@ import { BrowserSession } from "../../server/browser/browser-session.js";
 import type { ConversationState } from "../../server/browser/types.js";
 
 const live =
-		process.env.DEALFINDER_LIVE_RESTART === "1" &&
+		process.env.RICK_LIVE_RESTART === "1" &&
 		Boolean(process.env.BROWSERBASE_API_KEY),
-	phase = process.env.DEALFINDER_RESTART_PHASE,
-	stateFile = process.env.DEALFINDER_RESTART_STATE_FILE;
+	phase = process.env.RICK_RESTART_PHASE,
+	stateFile = process.env.RICK_RESTART_STATE_FILE;
 
 describe("opt-in Browserbase restart recovery", () => {
 	it.runIf(live && phase === "prepare")(
@@ -23,7 +23,7 @@ describe("opt-in Browserbase restart recovery", () => {
 					browser: { provider: "not-started", status: "idle" },
 				},
 				session = new BrowserSession(state),
-				fixture = "https://dealfinder-fixture.invalid/restart-otp",
+				fixture = "https://rick-fixture.invalid/restart-otp",
 				page = `
           <title>Restart OTP fixture</title>
           <form id="login">

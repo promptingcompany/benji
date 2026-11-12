@@ -19,8 +19,8 @@ it.each([
 	"1",
 ])("rejects cross-origin Basic writes without falling through to dev auth (%s)", async (dev) => {
 	vi.stubEnv("EVE_DEV", dev);
-	vi.stubEnv("DEALFINDER_OPERATOR_USERNAME", "operator");
-	vi.stubEnv("DEALFINDER_OPERATOR_PASSWORD", password);
+	vi.stubEnv("RICK_OPERATOR_USERNAME", "operator");
+	vi.stubEnv("RICK_OPERATOR_PASSWORD", password);
 	const callback = vi.fn(async () => ({
 		status: "accepted",
 		sessionId: "synthetic-session",
@@ -33,7 +33,7 @@ it.each([
 		for (const credential of [authorization, "", "Basic d3Jvbmc6d3Jvbmc="]) {
 			const response = await cancel.handler(
 				new Request(
-					"https://dealfinder.example/eve/v1/session/synthetic-session/cancel",
+					"https://rick.example/eve/v1/session/synthetic-session/cancel",
 					{
 						method: "POST",
 						headers: {
@@ -54,10 +54,10 @@ it.each([
 	expect(callback).not.toHaveBeenCalled();
 	const response = await cancel.handler(
 		new Request(
-			"https://dealfinder.example/eve/v1/session/synthetic-session/cancel",
+			"https://rick.example/eve/v1/session/synthetic-session/cancel",
 			{
 				method: "POST",
-				headers: { authorization, origin: "https://dealfinder.example" },
+				headers: { authorization, origin: "https://rick.example" },
 				body: "{}",
 			},
 		),
@@ -70,14 +70,14 @@ it.each([
 });
 
 it("accepts the original origin through Next's proxy and rejects a different origin", async () => {
-	vi.stubEnv("DEALFINDER_OPERATOR_USERNAME", "operator");
-	vi.stubEnv("DEALFINDER_OPERATOR_PASSWORD", password);
+	vi.stubEnv("RICK_OPERATOR_USERNAME", "operator");
+	vi.stubEnv("RICK_OPERATOR_PASSWORD", password);
 	const callback = vi.fn(async () => ({
 		status: "accepted",
 		sessionId: "synthetic-session",
 	}));
 	for (const [origin, status] of [
-		["https://dealfinder.example", 202],
+		["https://rick.example", 202],
 		["https://other.example", 403],
 	] as const) {
 		const response = await cancel.handler(
@@ -89,7 +89,7 @@ it("accepts the original origin through Next's proxy and rejects a different ori
 						authorization,
 						origin,
 						host: "127.0.0.1:4274",
-						"x-forwarded-host": "dealfinder.example",
+						"x-forwarded-host": "rick.example",
 						"x-forwarded-proto": "https",
 					},
 					body: "{}",
@@ -109,8 +109,8 @@ it("accepts the original origin through Next's proxy and rejects a different ori
 
 it("rejects cross-site writes with default local development configuration", async () => {
 	vi.stubEnv("EVE_DEV", "1");
-	vi.stubEnv("DEALFINDER_OPERATOR_USERNAME", "");
-	vi.stubEnv("DEALFINDER_OPERATOR_PASSWORD", "");
+	vi.stubEnv("RICK_OPERATOR_USERNAME", "");
+	vi.stubEnv("RICK_OPERATOR_PASSWORD", "");
 	const callback = vi.fn(async () => ({
 		status: "accepted",
 		sessionId: "synthetic-session",
@@ -164,8 +164,8 @@ it("rejects cross-site writes with default local development configuration", asy
 it("advertises Basic authentication and accepts authenticated server clients", async () => {
 	vi.stubEnv("EVE_DEV", "0");
 	vi.stubEnv("VERCEL_ENV", "production");
-	vi.stubEnv("DEALFINDER_OPERATOR_USERNAME", "operator");
-	vi.stubEnv("DEALFINDER_OPERATOR_PASSWORD", password);
+	vi.stubEnv("RICK_OPERATOR_USERNAME", "operator");
+	vi.stubEnv("RICK_OPERATOR_PASSWORD", password);
 	const callback = vi.fn(async () => ({
 		status: "accepted",
 		sessionId: "synthetic-session",
@@ -175,7 +175,7 @@ it("advertises Basic authentication and accepts authenticated server clients", a
 		attachSession: () => ({ cancel: callback }),
 	};
 	const endpoint =
-		"https://dealfinder.example/eve/v1/session/synthetic-session/cancel";
+		"https://rick.example/eve/v1/session/synthetic-session/cancel";
 	const unauthenticated = await cancel.handler(
 		new Request(endpoint, { method: "POST", body: "{}" }),
 		context as never,
@@ -184,7 +184,7 @@ it("advertises Basic authentication and accepts authenticated server clients", a
 		throw new Error("Expected an HTTP response.");
 	expect(unauthenticated.status).toBe(401);
 	expect(unauthenticated.headers.get("www-authenticate")).toContain(
-		'Basic realm="dealfinder", charset="UTF-8"',
+		'Basic realm="Rick", charset="UTF-8"',
 	);
 	expect(unauthenticated.headers.get("www-authenticate")).toContain("Bearer");
 	expect(callback).not.toHaveBeenCalled();
@@ -205,8 +205,8 @@ it("advertises Basic authentication and accepts authenticated server clients", a
 
 it("denies development auth for foreign URL, Host, or forwarded Host on reads and writes", async () => {
 	vi.stubEnv("EVE_DEV", "1");
-	vi.stubEnv("DEALFINDER_OPERATOR_USERNAME", "");
-	vi.stubEnv("DEALFINDER_OPERATOR_PASSWORD", "");
+	vi.stubEnv("RICK_OPERATOR_USERNAME", "");
+	vi.stubEnv("RICK_OPERATOR_PASSWORD", "");
 	const attachSession = vi.fn();
 	const cases = [
 		{
@@ -273,8 +273,8 @@ it.each([
 	"[::1]",
 ])("accepts development reads and writes on %s", async (host) => {
 	vi.stubEnv("EVE_DEV", "1");
-	vi.stubEnv("DEALFINDER_OPERATOR_USERNAME", "");
-	vi.stubEnv("DEALFINDER_OPERATOR_PASSWORD", "");
+	vi.stubEnv("RICK_OPERATOR_USERNAME", "");
+	vi.stubEnv("RICK_OPERATOR_PASSWORD", "");
 	const attachSession = vi.fn(() => ({
 		id: "synthetic-session",
 		cancel: async () => ({

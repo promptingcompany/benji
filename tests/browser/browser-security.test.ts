@@ -219,7 +219,7 @@ describe("browser navigation boundary", () => {
 		expect(batch).toHaveBeenCalledOnce();
 	});
 	it.each([
-		"file:///tmp/dealfinder-synthetic-fixture",
+		"file:///tmp/rick-synthetic-fixture",
 		"javascript:alert(1)",
 		"data:text/html,example",
 		"https://user:password@shop.example/",
@@ -235,7 +235,7 @@ describe("browser navigation boundary", () => {
 		await expect(
 			session.run([
 				{ action: "goto", url: "https://shop.example/" },
-				{ action: "goto", url: "file:///tmp/dealfinder-synthetic-fixture" },
+				{ action: "goto", url: "file:///tmp/rick-synthetic-fixture" },
 			]),
 		).rejects.toThrow();
 		expect(batch).not.toHaveBeenCalled();

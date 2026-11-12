@@ -19,14 +19,14 @@ const target = {
 describe("browser handoff", () => {
 	afterEach(() => {
 		vi.unstubAllEnvs();
-		delete process.env.DEALFINDER_HANDOFF_SECRET;
-		delete process.env.DEALFINDER_PUBLIC_URL;
+		delete process.env.RICK_HANDOFF_SECRET;
+		delete process.env.RICK_PUBLIC_URL;
 	});
 
 	it("allows the same-origin Live View redirect while retaining private response headers", async () => {
-		vi.stubEnv("DEALFINDER_HANDOFF_SECRET", secret);
+		vi.stubEnv("RICK_HANDOFF_SECRET", secret);
 		const token = issueBrowserHandoffToken(target, { secret });
-		const response = await GET(new Request("https://dealfinder.example"), {
+		const response = await GET(new Request("https://rick.example"), {
 			params: Promise.resolve({ token }),
 		});
 		expect(response.status).toBe(200);
@@ -42,7 +42,7 @@ describe("browser handoff", () => {
 	});
 
 	it("rejects invalid and expired page tokens before rendering a frame", async () => {
-		vi.stubEnv("DEALFINDER_HANDOFF_SECRET", secret);
+		vi.stubEnv("RICK_HANDOFF_SECRET", secret);
 		for (const [token, status] of [
 			["invalid", 404],
 			[
@@ -50,7 +50,7 @@ describe("browser handoff", () => {
 				410,
 			],
 		] as const) {
-			const response = await GET(new Request("https://dealfinder.example"), {
+			const response = await GET(new Request("https://rick.example"), {
 				params: Promise.resolve({ token }),
 			});
 			expect(response.status).toBe(status);
@@ -61,13 +61,13 @@ describe("browser handoff", () => {
 
 	it("issues an opaque URL and verifies its scoped session target", () => {
 		const url = issueBrowserHandoffUrl(target, {
-			publicUrl: "https://dealfinder.example",
+			publicUrl: "https://rick.example",
 			secret,
 			now: 1_000,
 			ttlMs: 60_000,
 		});
 
-		expect(url).toMatch(/^https:\/\/dealfinder\.example\/handoff\/v1\./);
+		expect(url).toMatch(/^https:\/\/rick\.example\/handoff\/v1\./);
 		expect(url).not.toContain(target.eveSessionId);
 		expect(url).not.toContain(target.browserSessionId);
 		const token = new URL(url).pathname.split("/").at(-1)!;
@@ -126,7 +126,7 @@ describe("browser handoff", () => {
 	it("requires a strong secret and an HTTPS public URL", () => {
 		expect(() =>
 			issueBrowserHandoffUrl(target, {
-				publicUrl: "http://dealfinder.example",
+				publicUrl: "http://rick.example",
 				secret,
 			}),
 		).toThrowError(expect.objectContaining({ code: "configuration" }));

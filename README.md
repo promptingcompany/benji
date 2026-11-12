@@ -3,7 +3,7 @@
 Benji is a personal shopping agent from The Prompting Company, built on
 [Eve](https://eve.dev/docs). Give it a purchase, a budget and a postcode. It compares
 sellers on the delivered total, checks the merchant's own page, and takes the item as far
-as the payment page. It never pays.
+as the payment page.
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fpromptingcompany%2Fdealfinder&env=OPENAI_API_KEY,BROWSERBASE_API_KEY,BENJI_OPERATOR_USERNAME,BENJI_OPERATOR_PASSWORD&envDescription=An+OpenAI+key+for+the+model,+a+Browserbase+key+for+the+hosted+browser,+and+the+username+and+password+%28at+least+32+characters%29+that+protect+your+deployment.&envLink=https%3A%2F%2Fgithub.com%2Fpromptingcompany%2Fdealfinder%23keys&project-name=benji&repository-name=benji)
 

@@ -8,11 +8,18 @@ const source = new URL(
 );
 // On Vercel, `next build` runs a second Eve build into its own service output, and that
 // is the output that gets deployed, so every build output present gets the archive.
-const stagehandDirectories = glob([
-	".output/**/node_modules/@browserbasehq/stagehand/dist",
-	".vercel/output/**/node_modules/@browserbasehq/stagehand/dist",
-	".eve/vercel-services/*/.vercel/output/**/node_modules/@browserbasehq/stagehand/dist",
-]);
+// Tools run in the workflow function under functions/.well-known, which `**` skips
+// because it is a dot directory, so it has its own pattern.
+const stagehandDirectories = glob(
+	[
+		".output",
+		".vercel/output",
+		".eve/vercel-services/*/.vercel/output",
+	].flatMap((output) => [
+		`${output}/**/node_modules/@browserbasehq/stagehand/dist`,
+		`${output}/functions/.well-known/**/node_modules/@browserbasehq/stagehand/dist`,
+	]),
+);
 let copied = 0;
 for await (const directory of stagehandDirectories) {
 	const destination = join(directory, "assets");

@@ -7,6 +7,17 @@ export interface BaselayerConfig {
 }
 
 /** Server-side only. The configured principal belongs to this single-user demo. */
+export function baselayerConfigured(
+	env: Record<string, string | undefined> = process.env,
+): boolean {
+	try {
+		baselayerConfig(env);
+		return true;
+	} catch {
+		return false;
+	}
+}
+
 export function baselayerConfig(
 	env: Record<string, string | undefined> = process.env,
 ): BaselayerConfig {

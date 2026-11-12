@@ -254,6 +254,20 @@ describe("shared hosted-page integration boundary", () => {
 		expect(received[0]).toBe("extension archive");
 	}, 20_000);
 
+	it("names the underlying reason when a launch fails", async () => {
+		const { launch, session } = hostedLaunch();
+		launch.mockRejectedValue(
+			new Error("Failed to upload the Stagehand extension.", {
+				cause: new Error("ENOENT: no such file or directory"),
+			}),
+		);
+		const failure = expect(session.start()).rejects.toThrow(
+			"Cause: ENOENT: no such file or directory",
+		);
+		await vi.runAllTimersAsync();
+		await failure;
+	});
+
 	it("retries a rate-limited session request", async () => {
 		const { launch, session } = hostedLaunch();
 		vi.stubGlobal(

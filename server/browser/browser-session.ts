@@ -740,7 +740,7 @@ export class BrowserSession {
 				return;
 			} catch (error) {
 				const refusal = refusals.refusal();
-				lastError = refusal ?? error;
+				lastError = refusal ?? withCause(error);
 				await this.stagehand?.close().catch(() => undefined);
 				await launched?.close().catch(() => undefined);
 				this.stagehand = undefined;
@@ -1029,6 +1029,16 @@ export function browserProvider(): "local" | "browserbase" {
 // project, which is shorter than one checkout. The idle timer releases the browser
 // earlier when the conversation stops.
 const HOSTED_SESSION_TIMEOUT_SECONDS = 60 * 60;
+
+// Stagehand wraps launch failures, such as a failed extension upload, in a generic
+// message and keeps the real reason in `cause`, which callers never see.
+function withCause(error: unknown): unknown {
+	if (!(error instanceof Error) || !(error.cause instanceof Error))
+		return error;
+	return new Error(`${error.message} Cause: ${error.cause.message}`, {
+		cause: error.cause,
+	});
+}
 
 export function hostedBrowserFeatures(): HostedBrowserFeatures {
 	return {

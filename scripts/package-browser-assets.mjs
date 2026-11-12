@@ -6,13 +6,16 @@ const source = new URL(
 	"./assets/stagehand-extension.zip",
 	import.meta.resolve("@browserbasehq/stagehand"),
 );
-const output = process.env.VERCEL ? ".vercel/output" : ".output";
+// On Vercel, `next build` runs a second Eve build into its own service output, and that
+// is the output that gets deployed, so every build output present gets the archive.
+const stagehandDirectories = glob([
+	".output/**/node_modules/@browserbasehq/stagehand/dist",
+	".vercel/output/**/node_modules/@browserbasehq/stagehand/dist",
+	".eve/vercel-services/*/.vercel/output/**/node_modules/@browserbasehq/stagehand/dist",
+]);
 let copied = 0;
-for await (const directory of glob(
-	"**/node_modules/@browserbasehq/stagehand/dist",
-	{ cwd: output },
-)) {
-	const destination = join(output, directory, "assets");
+for await (const directory of stagehandDirectories) {
+	const destination = join(directory, "assets");
 	await mkdir(destination, { recursive: true });
 	await copyFile(source, join(destination, "stagehand-extension.zip"));
 	copied++;

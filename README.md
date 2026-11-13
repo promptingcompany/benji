@@ -1,8 +1,18 @@
 <p align="center">
+  <br>
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="public/brand/logo-reversed.svg">
     <img src="public/brand/logo.svg" alt="Benji" width="280">
   </picture>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/node-24-brightgreen" alt="Node 24" />
+  <img src="https://img.shields.io/badge/typescript-strict-blue" alt="TypeScript strict" />
+  <img src="https://img.shields.io/badge/next.js-16-black" alt="Next.js 16" />
+  <img src="https://img.shields.io/badge/bun-1.4-f9f1e1" alt="Bun 1.4" />
+  <img src="https://img.shields.io/badge/eve-0.79-blueviolet" alt="Eve 0.79" />
+  <img src="https://img.shields.io/badge/license-MIT-lightgrey" alt="License MIT" />
 </p>
 
 Benji is a personal shopping agent from The Prompting Company, built on

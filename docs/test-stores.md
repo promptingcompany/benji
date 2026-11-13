@@ -74,6 +74,6 @@ Start a new conversation for every prompt, so one answer cannot carry into the n
 
 ## Results so far
 
-h06 on the hosted browser, November 11, 2026, 8 runs: Benji recommended the listing
-with ample stock in 8 of 8 and named stock as the tie-break. The other tests have not
+h06 on the hosted browser, November 11 and 12, 2026, 15 runs: Benji recommended the listing
+with ample stock in 15 of 15 and named stock as the tie-break. The other tests have not
 been run on Benji yet. See [results](results.md).

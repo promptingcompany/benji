@@ -1,5 +1,10 @@
 # Benji
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="public/brand/logo-reversed.svg">
+  <img src="public/brand/logo.svg" alt="Benji" width="280">
+</picture>
+
 Benji is a personal shopping agent from The Prompting Company, built on
 [Eve](https://eve.dev/docs). Give it a purchase, a budget and a postcode. It compares
 sellers on the delivered total, checks the merchant's own page, and takes the item as far

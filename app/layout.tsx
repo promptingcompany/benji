@@ -3,7 +3,7 @@ import "./style.css";
 
 export const metadata = {
 	title: "Benji",
-	icons: { icon: "/benji.svg" },
+	icons: { icon: "/brand/app-icon.svg" },
 	description:
 		"Meet Benji, The Prompting Company's personal shopping agent. Research products, compare offers, and find the right fit.",
 };

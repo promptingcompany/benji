@@ -20,6 +20,9 @@ The shopping identity and rules in `agent/instructions.md` and
 `agent/skills/shopping-research/SKILL.md`, the `compare_offers` tool, the shopping web
 interface, the configuration readiness display, and conversation export.
 
+The app and README use Benji's supplied brand artwork in `public/brand/`, including
+the wordmark, face icon, and app icon.
+
 ## Differences in tooling
 
 - Bun and Biome replace the upstream package manager and lint setup.

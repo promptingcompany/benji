@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <title>Benji</title>
+  <defs>
+    <!-- left half of the face opening; mirrored for the right -->
+    <path id="face-half" d="M202,81 L200,81 C150,81 103,120 103,172 L103,186 C103,196 98,204 93,211 C85,224 80,240 80,258 C80,290 105,307 140,311.5 C160,315 180,317 200,317 L202,317 Z"/>
+    <!-- left half of the hair -->
+    <g id="hair-half">
+      <path d="M202,56.5 L200,56.5 A135.5,118.5 0 0 0 64.5,175 L65,312 L138,318.5 Q169,324 200,324 L202,324 Z"/>
+      <circle cx="64" cy="220" r="36"/>
+      <path d="M66,166 C65,177 60,181 46,190 L72,205 Z"/>
+      <ellipse cx="60.5" cy="277" rx="38" ry="37.5"/>
+      <circle cx="100" cy="308.5" r="36.5"/>
+    </g>
+    <mask id="face-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="400" height="400">
+      <rect width="400" height="400" fill="#fff"/>
+      <use href="#face-half" fill="#000"/>
+      <use href="#face-half" fill="#000" transform="matrix(-1 0 0 1 400 0)"/>
+    </mask>
+  </defs>
+
+  <g fill="#1C1C20" mask="url(#face-cut)">
+    <use href="#hair-half"/>
+    <use href="#hair-half" transform="matrix(-1 0 0 1 400 0)"/>
+  </g>
+
+  <g fill="none" stroke="#1C1C20">
+    <circle cx="154" cy="198.7" r="25.6" stroke-width="7"/>
+    <circle cx="246" cy="198.7" r="25.6" stroke-width="7"/>
+    <path d="M179.5,197.5 Q200,180.5 220.5,197.5" stroke-width="7"/>
+  </g>
+</svg>

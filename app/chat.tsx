@@ -194,21 +194,20 @@ export default function Chat({
 
 	return (
 		<main className="mx-auto flex h-dvh max-w-[1800px] flex-col overflow-hidden">
-			<header className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6">
+			<header className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-4 py-5 sm:px-6">
 				<div className="flex items-center gap-2.5">
-					<Image
-						src="/benji.svg"
-						width={36}
-						height={36}
-						alt=""
-						loading="eager"
-					/>
-					<div>
-						<h1 className="text-xl font-semibold tracking-tight">Benji</h1>
-						<p className="text-[10px] text-muted-foreground">
-							by The Prompting Company
-						</p>
-					</div>
+					<h1 className="shrink-0">
+						<Image
+							src="/brand/logo.svg"
+							width={100}
+							height={28}
+							alt="Benji"
+							loading="eager"
+						/>
+					</h1>
+					<p className="max-w-20 text-[10px] text-muted-foreground sm:max-w-none">
+						by The Prompting Company
+					</p>
 				</div>
 				<div className="flex flex-wrap gap-2">
 					<Button
@@ -268,10 +267,10 @@ export default function Chat({
 							{messages.length === 0 && (
 								<div className="py-8 sm:py-16">
 									<Image
-										src="/benji.svg"
+										src="/brand/icon.svg"
 										width={56}
 										height={56}
-										alt="Benji: a spark inside a circle"
+										alt="Benji"
 										loading="eager"
 										className="mb-6"
 									/>

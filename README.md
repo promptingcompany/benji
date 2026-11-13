@@ -1,5 +1,3 @@
-# Benji
-
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="public/brand/logo-reversed.svg">
   <img src="public/brand/logo.svg" alt="Benji" width="280">

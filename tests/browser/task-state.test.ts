@@ -7,6 +7,7 @@ import {
 	recordTaskBrowserContext,
 	safeText,
 	setTaskBrowserContext,
+	type TaskEvent,
 	updateTaskBrowser,
 } from "../../agent/lib/task-state";
 
@@ -21,15 +22,18 @@ const empty = (): DurableTaskRecord => ({
 	createdAt: "",
 	updatedAt: "",
 });
-const event = (
-	type: string,
-	id: string,
-	data: Record<string, unknown> = {},
-) => ({
-	type,
-	data,
-	meta: { id, at: "2026-09-05T00:00:00.000Z" },
-});
+const event = (type: TaskEvent["type"], id: string, data: object = {}) =>
+	({
+		type,
+		data,
+		meta: { id, at: "2026-09-05T00:00:00.000Z" },
+	}) as TaskEvent;
+const message = (id: string, text: string) =>
+	event("delivery.consumed", id, {
+		deliveryId: id,
+		turnId: "turn_0",
+		parts: [{ kind: "text", text }],
+	});
 
 describe("durable Eve task state", () => {
 	it("keeps a Context naming hint without copying Eve's conversation history", () => {
@@ -40,14 +44,16 @@ describe("durable Eve task state", () => {
 		);
 		state = applyTaskEvent(
 			state,
-			event("message.received", "evt_user", {
-				message: "Research durable agents",
-			}),
+			message("evt_user", "Research durable agents"),
 			"session_fixture",
 		);
 		state = applyTaskEvent(
 			state,
-			event("message.completed", "evt_assistant", { message: "Finished." }),
+			event("content.completed", "evt_assistant", {
+				kind: "text",
+				phase: "reply",
+				value: "Finished.",
+			}),
 			"session_fixture",
 		);
 		expect(state).toMatchObject({
@@ -60,12 +66,12 @@ describe("durable Eve task state", () => {
 	it("keeps the original Context naming hint across follow-ups", () => {
 		let state = applyTaskEvent(
 			empty(),
-			event("message.received", "evt_one", { message: "Start" }),
+			message("evt_one", "Start"),
 			"session_fixture",
 		);
 		state = applyTaskEvent(
 			state,
-			event("message.received", "evt_two", { message: "move it back" }),
+			message("evt_two", "move it back"),
 			"session_fixture",
 		);
 		expect(state.sessionId).toBe("session_fixture");
@@ -76,7 +82,7 @@ describe("durable Eve task state", () => {
 		let state = applyTaskEvent(empty(), started, "session_fixture");
 		state = applyTaskEvent(
 			state,
-			event("turn.completed", "evt_end"),
+			event("turn.settled", "evt_end", { outcome: "completed" }),
 			"session_fixture",
 		);
 		expect(applyTaskEvent(state, started, "session_fixture")).toBe(state);
@@ -85,7 +91,9 @@ describe("durable Eve task state", () => {
 	it("survives human waits and resumes the same workflow", () => {
 		let state = applyTaskEvent(
 			empty(),
-			event("input.requested", "evt_wait", { prompt: "Enter OTP code" }),
+			event("interaction.opened", "evt_wait", {
+				request: { kind: "question", prompt: "Enter OTP code" },
+			}),
 			"session_fixture",
 		);
 		expect(state).toMatchObject({
@@ -94,7 +102,9 @@ describe("durable Eve task state", () => {
 		});
 		state = applyTaskEvent(
 			state,
-			event("session.waiting", "evt_parked"),
+			event("turn.paused", "evt_parked", {
+				awaiting: [{ interactionId: "evt_wait" }],
+			}),
 			"session_fixture",
 		);
 		expect(state).toMatchObject({
@@ -103,7 +113,7 @@ describe("durable Eve task state", () => {
 		});
 		state = applyTaskEvent(
 			state,
-			event("input.resolved", "evt_resume"),
+			event("interaction.settled", "evt_resume", { outcome: "accepted" }),
 			"session_fixture",
 		);
 		expect(state).toMatchObject({ status: "running", activeStep: "resuming" });
@@ -128,7 +138,7 @@ describe("durable Eve task state", () => {
 		};
 		let state = applyTaskEvent(
 			legacy,
-			event("message.received", "evt_followup", { message: "Continue" }),
+			message("evt_followup", "Continue"),
 			"session_fixture",
 		);
 		state = updateTaskBrowser(state, {
@@ -204,7 +214,7 @@ describe("durable Eve task state", () => {
 					url: "https://example.com/login",
 				},
 			},
-			event("turn.cancelled", "evt_cancel"),
+			event("turn.settled", "evt_cancel", { outcome: "cancelled" }),
 			"session_fixture",
 		);
 		expect(state).toMatchObject({

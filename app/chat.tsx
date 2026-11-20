@@ -1,6 +1,7 @@
 "use client";
 
 import { Client } from "eve/client";
+import { openInteractions } from "eve/events";
 import { useEveAgent } from "eve/react";
 import {
 	ArrowUp,
@@ -93,23 +94,16 @@ export default function Chat({
 			}
 		},
 	});
-	const busy = agent.status === "submitted" || agent.status === "streaming";
+	const busy = agent.status === "busy";
 	const waiting = busy || agent.status === "resuming" || retiring;
 	let activity = "Researching your options…";
 	if (agent.status === "resuming") activity = "Loading conversation…";
 	if (retiring) activity = "Closing research…";
 	const preview = browserPreview(agent.events);
-	const messages = agent.data.messages.filter(
-		(message) => message.role === "user" || message.role === "assistant",
+	const messages = agent.messages;
+	const pending = openInteractions(agent.view).filter(
+		(interaction) => interaction.request.kind !== "sign-in",
 	);
-	const pending = agent.data.messages
-		.flatMap((message) => message.parts)
-		.flatMap((part) => {
-			if (part.type !== "dynamic-tool" || part.state !== "approval-requested")
-				return [];
-			const request = part.toolMetadata?.eve?.inputRequest;
-			return request ? [request] : [];
-		});
 
 	async function send() {
 		if (!input.trim() || waiting || configuration.missing.length) return;
@@ -137,10 +131,10 @@ export default function Chat({
 		setError("");
 		try {
 			if (agent.session)
-				await new Client({ host: "" }).sessions
+				await new Client({ baseUrl: "" }).sessions
 					.attach(agent.session.sessionId)
-					.reset({ signal: AbortSignal.timeout(10_000) });
-			agent.reset();
+					.end({ signal: AbortSignal.timeout(10_000) });
+			agent.newSession();
 			setInput("");
 			setBudget("");
 			setDestination("");
@@ -159,7 +153,7 @@ export default function Chat({
 		setStopping(true);
 		setError("");
 		try {
-			await new Client({ host: "" }).sessions
+			await new Client({ baseUrl: "" }).sessions
 				.attach(agent.session.sessionId)
 				.cancel({ signal: AbortSignal.timeout(10_000) });
 		} catch {
@@ -347,9 +341,9 @@ export default function Chat({
 									{activity}
 								</div>
 							)}
-							{pending.map((request) => (
+							{pending.map(({ interactionId, request }) => (
 								<fieldset
-									key={request.requestId}
+									key={interactionId}
 									className="my-4 space-y-3 rounded-lg border border-border p-4"
 								>
 									<legend className="px-1 text-sm font-medium">
@@ -363,7 +357,7 @@ export default function Chat({
 												void agent
 													.respond([
 														{
-															requestId: request.requestId,
+															interactionId,
 															optionId: option.id,
 														},
 													])
@@ -383,18 +377,18 @@ export default function Chat({
 												).trim();
 												if (text)
 													void agent
-														.respond([{ requestId: request.requestId, text }])
+														.respond([{ interactionId, text }])
 														.catch(() => setError("Reply failed. Try again."));
 											}}
 										>
 											<label
-												htmlFor={`reply-${request.requestId}`}
+												htmlFor={`reply-${interactionId}`}
 												className="text-sm"
 											>
 												Your reply
 											</label>
 											<Input
-												id={`reply-${request.requestId}`}
+												id={`reply-${interactionId}`}
 												name="reply"
 												required
 											/>

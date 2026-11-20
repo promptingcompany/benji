@@ -3,7 +3,7 @@ import { randomUUID } from "node:crypto";
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import Browserbase from "@browserbasehq/sdk";
-import { Client } from "eve/client";
+import { Client, SessionNotActiveError } from "eve/client";
 import { chromium } from "playwright-core";
 import { restrictBrowserRequests } from "./browser-test-auth.ts";
 
@@ -70,7 +70,11 @@ function assertNoSecrets(value) {
 			`${key} must not appear in conversation data or rendered HTML.`,
 		);
 }
-const client = new Client({ host: origin.origin, headers, redirect: "error" });
+const client = new Client({
+	baseUrl: origin.origin,
+	headers,
+	redirect: "error",
+});
 const browserbase = new Browserbase({
 	apiKey: process.env.BROWSERBASE_API_KEY,
 	timeout: 10_000,
@@ -190,7 +194,7 @@ async function workflow(index) {
 		stage = "session creation";
 	const remember = (events) => {
 		for (const event of events) {
-			const state = event.data?.result?.output?.workbench?.browser;
+			const state = event.data?.output?.workbench?.browser;
 			if (state?.sessionId) hostedIds.add(state.sessionId);
 			if (state?.contextId && state.contextStatus === "draft")
 				contextIds.add(state.contextId);
@@ -243,14 +247,22 @@ async function workflow(index) {
 		remember(snapshot.events);
 		assertNoSecrets(snapshot);
 		assertNoSecrets(await page.content());
+		const toolNames = new Map(
+			snapshot.events
+				.filter((event) => event.type === "call.requested")
+				.map((event) => [event.data.callId, event.data.capability.name]),
+		);
 		const calls = snapshot.events
-			.filter((event) => event.type === "action.result")
-			.map((event) => event.data?.result);
+			.filter((event) => event.type === "call.settled")
+			.map((event) => ({
+				...event.data,
+				toolName: toolNames.get(event.data.callId),
+			}));
 		assert.equal(calls.length, 4, "Only the four requested tools may run.");
 		for (const name of ["web_search", "web_fetch", "run", "snapshot"]) {
-			const matching = calls.filter((call) => call?.toolName === name);
+			const matching = calls.filter((call) => call.toolName === name);
 			assert.equal(matching.length, 1, `${name} must run exactly once`);
-			assert.ok(!matching[0].isError, `${name} must succeed`);
+			assert.equal(matching[0].outcome, "completed", `${name} must succeed`);
 		}
 		const answer = await page
 			.locator(".messages article.assistant")
@@ -319,11 +331,13 @@ async function workflow(index) {
 				await session.snapshot({ signal: AbortSignal.timeout(10_000) })
 			).events;
 			remember(events);
-			assert.ok(
-				!events.some((event) => event.type === "session.failed"),
+			const end = events.find((event) => event.type === "session.ended");
+			assert.notEqual(
+				end?.data.outcome,
+				"failed",
 				"Conversation retirement failed",
 			);
-			return events.some((event) => event.type === "session.completed");
+			return end?.data.outcome === "completed";
 		}, "New conversation must retire the previous Eve session");
 		for (const id of hostedIds)
 			await until(
@@ -368,12 +382,13 @@ async function workflow(index) {
 				failures.push("Could not recover final session events");
 			}
 			try {
-				await session.reset({
+				await session.end({
 					reason: "Parallel browser E2E cleanup",
 					signal: AbortSignal.timeout(30_000),
 				});
-			} catch {
-				failures.push("Session reset failed");
+			} catch (error) {
+				if (!SessionNotActiveError.is(error))
+					failures.push("Session end failed");
 			}
 		}
 		for (const id of hostedIds) {

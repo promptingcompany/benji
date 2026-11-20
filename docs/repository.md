@@ -62,7 +62,7 @@ The web channel releases the hosted browser on terminal session events, includin
 when cleanup runs in a fresh worker. Eve 0.79.1 skips global stream hooks for completion outside
 a turn, so cleanup uses channel callbacks. A failed release retains the browser ID and reaches
 Eve's error logging; failed callbacks are not automatically retried. Starting a new conversation
-resets the prior session and releases its browser. Browserbase sessions still have provider
+ends the prior session and releases its browser. Browserbase sessions still have provider
 lifetimes, so this does not guarantee an indefinitely running browser.
 
 With Benji running locally and its provider credentials loaded, run the opt-in regression:
@@ -71,5 +71,5 @@ With Benji running locally and its provider credentials loaded, run the opt-in r
 BENJI_LIVE_RETIREMENT=1 bun run test:retirement:live
 ```
 
-The test opens example.com, checks browser reuse across two turns, resets the session, verifies
+The test opens example.com, checks browser reuse across two turns, ends the session, verifies
 provider release, and deletes its temporary Context. It uses the configured model and Browserbase.

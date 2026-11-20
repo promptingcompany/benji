@@ -281,8 +281,7 @@ it.each([
 			status: "accepted",
 			sessionId: "synthetic-session",
 		}),
-		getStreamTailIndex: async () => -1,
-		getEventStream: async () =>
+		getLineStream: async () =>
 			new ReadableStream({
 				start(controller) {
 					controller.close();

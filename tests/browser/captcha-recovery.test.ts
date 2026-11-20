@@ -21,6 +21,15 @@ import {
 
 afterEach(() => vi.restoreAllMocks());
 
+const reply = {
+	type: "delivery.consumed",
+	data: {
+		deliveryId: "delivery_reply",
+		turnId: "turn_1",
+		parts: [{ kind: "text", text: "done" }],
+	},
+} as const;
+
 describe("resuming a browser after CAPTCHA handoff", () => {
 	it.each([
 		"errored",
@@ -64,14 +73,11 @@ describe("resuming a browser after CAPTCHA handoff", () => {
 				});
 				expect(page.snapshot).not.toHaveBeenCalled();
 
-				await taskHooks.events!["message.received"]!(
-					{
-						type: "message.received",
-						data: { message: "done" },
-						meta: { id: "new-reply" },
-					} as never,
-					{ session: { id } } as never,
-				);
+				await taskHooks.events!["delivery.consumed"]!(reply, {
+					session: { id },
+					position: { line: 7, index: 0 },
+					now: new Date(),
+				} as never);
 				expect(
 					await runBrowserOperation(id, (browser) => browser.snapshot()),
 				).toMatchObject({
@@ -95,7 +101,7 @@ describe("resuming a browser after CAPTCHA handoff", () => {
 			taskState.update((current) => ({
 				...current,
 				sessionId: id,
-				processedEventIds: ["old-reply"],
+				processedEventIds: ["4:0"],
 			}));
 			taskState.update((current) =>
 				applyCaptchaTransition(current, {
@@ -111,14 +117,11 @@ describe("resuming a browser after CAPTCHA handoff", () => {
 					at: new Date().toISOString(),
 				}),
 			);
-			await taskHooks.events!["message.received"]!(
-				{
-					type: "message.received",
-					data: { message: "done" },
-					meta: { id: "old-reply" },
-				} as never,
-				{ session: { id } } as never,
-			);
+			await taskHooks.events!["delivery.consumed"]!(reply, {
+				session: { id },
+				position: { line: 4, index: 0 },
+				now: new Date(),
+			} as never);
 			expect(taskState.get()).toMatchObject({
 				status: "waiting_for_user",
 				captcha: { status: "errored" },

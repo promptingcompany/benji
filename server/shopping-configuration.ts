@@ -15,12 +15,20 @@ export function shoppingConfiguration(): ShoppingConfiguration {
 			!process.env.BROWSERBASE_API_KEY)
 			? "local"
 			: "browserbase";
-	const required =
-		browserMode === "local"
-			? ["OPENAI_API_KEY"]
-			: ["OPENAI_API_KEY", "BROWSERBASE_API_KEY"];
+	const missing: string[] = [];
+	if (
+		!configured(process.env.AI_GATEWAY_API_KEY) &&
+		!configured(process.env.VERCEL_OIDC_TOKEN) &&
+		process.env.VERCEL !== "1"
+	)
+		missing.push("AI_GATEWAY_API_KEY");
+	if (
+		browserMode === "browserbase" &&
+		!configured(process.env.BROWSERBASE_API_KEY)
+	)
+		missing.push("BROWSERBASE_API_KEY");
 	return {
-		missing: required.filter((name) => !configured(process.env[name])),
+		missing,
 		searchEnabled: configured(process.env.PARALLEL_API_KEY),
 		browserMode,
 	};

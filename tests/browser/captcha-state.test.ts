@@ -108,7 +108,8 @@ describe("durable CAPTCHA reducer", () => {
 		state = applyTaskEvent(
 			state,
 			{
-				type: "step.started",
+				type: "model.started",
+				data: { runId: "run_0", modelId: "openai/gpt-5.6-sol", attempt: 0 },
 				meta: { id: "step", at: "2026-09-05T00:00:02.000Z" },
 			},
 			state.sessionId,

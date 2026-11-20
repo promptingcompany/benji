@@ -1,8 +1,7 @@
-import { openai } from "@ai-sdk/openai";
 import { defineAgent } from "eve";
 
 export default defineAgent({
-	model: openai.responses(process.env.BENJI_MODEL ?? "gpt-5.6-sol"),
+	model: process.env.BENJI_MODEL ?? "openai/gpt-5.6-sol",
 	build: {
 		externalDependencies: [
 			"@1password/sdk",

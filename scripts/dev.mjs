@@ -58,7 +58,7 @@ for (const stream of [agent.stdout, agent.stderr]) {
 		if (
 			webStarted ||
 			shuttingDown ||
-			!line.includes("server listening at") ||
+			!line.includes("ready at") ||
 			!line.includes(agentOrigin)
 		)
 			return;

@@ -1,4 +1,5 @@
 import { defineState } from "eve/context";
+import type { HookEvent } from "eve/hooks";
 
 import type {
 	BrowserProxyLocation,
@@ -95,13 +96,10 @@ export function initializeTask(
 		? record
 		: { ...record, taskId: sessionId, sessionId, createdAt: at, updatedAt: at };
 }
+export type TaskEvent = HookEvent & { meta?: { id?: string; at?: string } };
 export function applyTaskEvent(
 	record: DurableTaskRecord,
-	event: {
-		type: string;
-		data?: Record<string, unknown>;
-		meta?: { id?: string; at?: string };
-	},
+	event: TaskEvent,
 	sessionId: string,
 ): DurableTaskRecord {
 	const id = event.meta?.id,
@@ -115,9 +113,13 @@ export function applyTaskEvent(
 			: next.processedEventIds,
 		updatedAt: at,
 	};
-	if (event.type === "message.received") {
+	if (event.type === "delivery.consumed") {
 		if (next.title === "New task") {
-			const text = safeText(event.data?.message ?? event.data?.text);
+			const text = safeText(
+				event.data.parts
+					.flatMap((part) => (part.kind === "text" ? [part.text] : []))
+					.join("\n"),
+			);
 			if (text) next = { ...next, title: text.slice(0, 64) };
 		}
 		// A reply after handoff permits a fresh observation of the existing page.
@@ -144,25 +146,25 @@ export function applyTaskEvent(
 					activeStep: "agent turn",
 					waitReason: undefined,
 				};
-	else if (event.type === "step.started")
+	else if (event.type === "model.started")
 		next = captchaBlocksGeneric(next)
 			? next
 			: { ...next, status: "running", activeStep: "model step" };
-	else if (event.type === "input.requested")
+	else if (event.type === "interaction.opened")
 		next = {
 			...next,
 			status: "waiting_for_user",
 			activeStep: "waiting for user",
 			waitReason: classifyWait(event.data),
 		};
-	else if (event.type === "input.resolved")
+	else if (event.type === "interaction.settled")
 		next = {
 			...next,
 			status: "running",
 			activeStep: "resuming",
 			waitReason: undefined,
 		};
-	else if (event.type === "turn.completed" || event.type === "session.waiting")
+	else if (event.type === "turn.settled" && event.data.outcome === "completed")
 		next = captchaBlocksGeneric(next)
 			? next
 			: {
@@ -171,16 +173,19 @@ export function applyTaskEvent(
 					activeStep: undefined,
 					waitReason: undefined,
 				};
-	else if (event.type === "turn.failed" || event.type === "session.failed")
+	else if (
+		(event.type === "turn.settled" || event.type === "session.ended") &&
+		event.data.outcome === "failed"
+	)
 		next = { ...next, status: "failed", activeStep: undefined };
-	else if (event.type === "turn.cancelled")
+	else if (event.type === "turn.settled" && event.data.outcome === "cancelled")
 		next = closeTaskBrowser({
 			...next,
 			status: "canceled",
 			activeStep: undefined,
 			waitReason: undefined,
 		});
-	else if (event.type === "session.completed")
+	else if (event.type === "session.ended")
 		next = { ...next, status: "complete", activeStep: undefined };
 	return next;
 }
@@ -390,10 +395,8 @@ export function closeTaskBrowser(record: DurableTaskRecord): DurableTaskRecord {
 		updatedAt: new Date().toISOString(),
 	};
 }
-function classifyWait(
-	data?: Record<string, unknown>,
-): DurableTaskRecord["waitReason"] {
-	const value = JSON.stringify(data ?? {}).toLowerCase();
+function classifyWait(data: object): DurableTaskRecord["waitReason"] {
+	const value = JSON.stringify(data).toLowerCase();
 	if (value.includes("captcha")) return "captcha";
 	if (value.includes("otp") || value.includes("code")) return "otp";
 	if (value.includes("approval")) return "approval";

@@ -1,9 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { browserPreview } from "../app/projection";
 
+let calls = 0;
 const event = (output: unknown, isError = false) => ({
-	type: "action.result",
-	data: { result: { kind: "tool-result", output, isError } },
+	type: "call.settled",
+	data: {
+		callId: `call_${++calls}`,
+		outcome: isError ? "failed" : "completed",
+		output,
+	},
 });
 describe("shared browser output in the Benji panel", () => {
 	it("reads the browser runtime's nested screenshot", () => {
@@ -51,9 +56,13 @@ describe("shared browser output in the Benji panel", () => {
 			browserPreview([
 				event({ httpStatus: 200, screenshot: "data:image/png;base64,aA==" }),
 				{
-					...ordinary,
-					data: { result: { ...ordinary.data.result, toolName: "run" } },
+					type: "call.requested",
+					data: {
+						callId: ordinary.data.callId,
+						capability: { kind: "tool", name: "run" },
+					},
 				},
+				ordinary,
 			]),
 		).toEqual({
 			url: "https://example.com/protected",

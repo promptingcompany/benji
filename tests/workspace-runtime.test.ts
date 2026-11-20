@@ -120,9 +120,18 @@ describe("Benji's shared browser runtime", () => {
 			});
 			expect(snapshotBrowser).toHaveBeenCalledOnce();
 
-			await lifecycle.events!["turn.completed"]!({} as never, context());
+			await lifecycle.events!["turn.settled"]!(
+				{
+					type: "turn.settled",
+					data: { turnId: "turn_0", outcome: "completed" },
+				},
+				context(),
+			);
 			expect(hasBrowserRuntime(sessionId)).toBe(true);
-			await browserChannelEvents["session.completed"]({}, undefined, context());
+			await browserChannelEvents["session.ended"](
+				{ type: "session.ended", data: { outcome: "completed" } },
+				context(),
+			);
 			expect(closeBrowser).toHaveBeenCalledOnce();
 			expect(hasBrowserRuntime(sessionId)).toBe(false);
 		}));

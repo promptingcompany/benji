@@ -9,7 +9,7 @@ The live proxy location test runs only when `BENJI_LIVE_PROXY_LOCATION=1` and
 
 ## Parallel research to browser
 
-Set `OPENAI_API_KEY`, `PARALLEL_API_KEY`, and `BROWSERBASE_API_KEY` in ignored `.env.local`.
+Set `AI_GATEWAY_API_KEY`, `PARALLEL_API_KEY`, and `BROWSERBASE_API_KEY` in ignored `.env.local`.
 Install Chrome or set `TEST_CHROME_PATH`, then run:
 
 ```sh

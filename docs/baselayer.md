@@ -24,7 +24,7 @@ BENJI_DEMO_URL=https://bell-stack-demo-site.vercel.app/protected
 STAGEHAND_BROWSER=browserbase
 ```
 
-Keep the OpenAI and Browserbase credentials already used by Benji. Restart Benji and start a new
+Keep the AI Gateway and Browserbase credentials already used by Benji. Restart Benji and start a new
 conversation after changing browser logging settings. The browser runtime refuses credential
 presentation if the browser session started with logging enabled.
 

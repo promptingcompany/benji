@@ -7,24 +7,6 @@ Hosted launches request managed proxies only with `BENJI_BROWSERBASE_PROXIES` on
 The live proxy location test runs only when `BENJI_LIVE_PROXY_LOCATION=1` and
 `BENJI_BROWSERBASE_PROXIES=1` are both set.
 
-## Parallel research to browser
-
-Set `AI_GATEWAY_API_KEY`, `PARALLEL_API_KEY`, and `BROWSERBASE_API_KEY` in ignored `.env.local`.
-Install Chrome or set `TEST_CHROME_PATH`, then run:
-
-```sh
-BENJI_LIVE_PARALLEL=1 bun run test:parallel:production
-```
-
-The runner starts isolated, authenticated production services and checks two concurrent
-conversations, citations, stream recovery, browser handoff, credential non-disclosure, and cleanup.
-Reports stay in ignored `.benji/parallel-e2e/`; failures, including cleanup failures, exit nonzero.
-
-For an existing instance, set `BENJI_TEST_ORIGIN` and run `BENJI_LIVE_PARALLEL=1 bun run test:parallel:live`.
-Remote staging requires the same HTTPS `BENJI_TEST_STAGING_ORIGIN`, the deployment's operator
-credentials (password at least 32 bytes), and `BENJI_TEST_PROTECTION_BYPASS` if protected.
-The runner sends credentials only to that exact origin. Local success does not certify staging.
-
 ## 1Password login and OTP
 
 Use a dedicated test vault with a Login item titled exactly

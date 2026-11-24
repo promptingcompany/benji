@@ -391,7 +391,8 @@ function scheduleIdleClose(sessionId: string, runtime: BrowserRuntime): void {
 }
 
 // Channel callbacks also run when Eve ends a session outside a turn.
-// Global stream hooks do not run on that path in Eve 0.79.1.
+// Global stream hooks did not run on that path in Eve 0.79.1, and this has not
+// been re-verified on Eve 1.x, so the channel callback stays.
 export const browserChannelEvents = {
 	async "session.ended"(_event: unknown, ctx: { session: { id: string } }) {
 		await closeBrowserRuntime(ctx.session.id);

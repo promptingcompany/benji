@@ -59,6 +59,31 @@ describe("browser handoff", () => {
 		}
 	});
 
+	it("uses the Vercel production domain when no public URL is configured", () => {
+		vi.stubEnv("VERCEL", "1");
+		vi.stubEnv("VERCEL_ENV", "preview");
+		vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", "benji.vercel.app");
+		vi.stubEnv("BENJI_PUBLIC_URL", undefined);
+		expect(issueBrowserHandoffUrl(target, { secret })).toMatch(
+			/^https:\/\/benji\.vercel\.app\/handoff\/v1\./,
+		);
+
+		vi.stubEnv("BENJI_PUBLIC_URL", "https://shop.example");
+		expect(issueBrowserHandoffUrl(target, { secret })).toMatch(
+			/^https:\/\/shop\.example\/handoff\/v1\./,
+		);
+	});
+
+	it("requires a public URL outside a Vercel deployment", () => {
+		vi.stubEnv("VERCEL", "1");
+		vi.stubEnv("VERCEL_ENV", "development");
+		vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", "benji.vercel.app");
+		vi.stubEnv("BENJI_PUBLIC_URL", undefined);
+		expect(() => issueBrowserHandoffUrl(target, { secret })).toThrow(
+			BrowserHandoffError,
+		);
+	});
+
 	it("issues an opaque URL and verifies its scoped session target", () => {
 		const url = issueBrowserHandoffUrl(target, {
 			publicUrl: "https://benji.example",

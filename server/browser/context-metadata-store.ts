@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import * as blob from "@vercel/blob";
 import { z } from "zod";
+import { onVercel } from "../vercel-runtime";
 
 const metadataSchema = z.object({
 	selectedContextId: z.string().optional(),
@@ -287,5 +288,5 @@ function hasBlobStore(): boolean {
 
 // Vercel functions can only write under /tmp; the deployed code directory is read-only.
 function writableRoot(): string {
-	return process.env.VERCEL ? os.tmpdir() : process.cwd();
+	return onVercel() ? os.tmpdir() : process.cwd();
 }

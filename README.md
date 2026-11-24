@@ -21,7 +21,7 @@ sellers on the delivered total, checks the merchant's own page, and takes the it
 as the payment page.
 
 <p align="center">
-  <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fpromptingcompany%2Fbenji&env=AI_GATEWAY_API_KEY,BROWSERBASE_API_KEY,BENJI_OPERATOR_USERNAME,BENJI_OPERATOR_PASSWORD&envDescription=An+AI+Gateway+key+for+the+model,+a+Browserbase+key+for+the+hosted+browser,+and+the+username+and+password+%28at+least+32+characters%29+that+protect+your+deployment.&envLink=https%3A%2F%2Fgithub.com%2Fpromptingcompany%2Fbenji%23keys&project-name=benji&repository-name=benji"><img src="https://vercel.com/button" alt="Deploy with Vercel" height="44"></a>
+  <a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fpromptingcompany%2Fbenji&env=BROWSERBASE_API_KEY,BENJI_OPERATOR_USERNAME,BENJI_OPERATOR_PASSWORD,BENJI_HANDOFF_SECRET&envDescription=A+Browserbase+key+for+the+hosted+browser,+the+username+and+password+%28at+least+32+characters%29+that+protect+your+deployment,+and+a+random+secret+%28at+least+32+characters%29+that+signs+handoff+links.&envLink=https%3A%2F%2Fgithub.com%2Fpromptingcompany%2Fbenji%23keys&project-name=benji&repository-name=benji&stores=%5B%7B%22type%22%3A%22blob%22%2C%22access%22%3A%22private%22%7D%5D"><img src="https://vercel.com/button" alt="Deploy with Vercel" height="44"></a>
 </p>
 
 It follows rules drawn from a study of how personal agents shop on live stores:
@@ -69,39 +69,47 @@ conversation can pause for the shopper at a handoff and pick up where it stopped
 
 ## Keys
 
-Two keys run the full agent. Everything else is optional and off by default.
+The model runs through [AI Gateway](https://vercel.com/docs/ai-gateway) and authenticates
+with your Vercel project's OIDC token, so there is no model key to manage. Public web
+search uses [Parallel through AI Gateway](https://vercel.com/ai-gateway/models/parallel/search)
+with the same token, billed per search to your AI Gateway usage. Everything else is optional and off by default.
 
 | Variable | Needed | What it does | Where to get it |
 | --- | --- | --- | --- |
-| `AI_GATEWAY_API_KEY` | Always | Runs the model (`openai/gpt-5.6-sol` by default) through AI Gateway. A Vercel deployment can use its OIDC token instead. | [vercel.com/docs/ai-gateway](https://vercel.com/docs/ai-gateway) |
+| `VERCEL_OIDC_TOKEN` | Local runs only | Runs the model (`openai/gpt-5.6-sol` by default) through AI Gateway. A Vercel deployment gets its token automatically. | `vercel env pull`, see [Run locally](#run-locally) |
 | `BROWSERBASE_API_KEY` | For hosted browsers | Opens the store pages in a hosted browser. | [browserbase.com](https://www.browserbase.com) |
-| `PARALLEL_API_KEY` | Optional | Adds public web search before the browser opens a page. | [parallel.ai](https://parallel.ai) |
 
-To try it with one key, set `STAGEHAND_BROWSER=local`. Benji then drives Chrome on
-your machine and needs only `AI_GATEWAY_API_KEY`. Some stores block a local browser sooner
+To try it with no keys, leave `BROWSERBASE_API_KEY` unset. Benji then drives Chrome on
+your machine and needs only the OIDC token. Some stores block a local browser sooner
 than a hosted one.
 
 | Setting | Default | Change it when |
 | --- | --- | --- |
-| `STAGEHAND_BROWSER` | `browserbase` | Set `local` to use your own Chrome. |
+| `STAGEHAND_BROWSER` | `auto` | `auto` uses Browserbase when its key is set and your own Chrome otherwise. Set `local` or `browserbase` to force one. |
+| `BROWSERBASE_PROJECT_ID` | unset | Your Browserbase key can reach more than one project. |
 | `BENJI_MODEL` | `openai/gpt-5.6-sol` | You want another [AI Gateway model](https://vercel.com/ai-gateway/models). |
 | `BENJI_BROWSERBASE_PROXIES` | off | Set `1` for Browserbase managed proxies. Needs a paid Browserbase plan. |
 | `BENJI_BROWSERBASE_VERIFIED` | off | Set `1` for Browserbase Verified Browsers. Needs the Enterprise plan. |
 | `BENJI_OPERATOR_USERNAME`, `BENJI_OPERATOR_PASSWORD` | unset | You expose the app beyond your own machine. The password must be at least 32 bytes. |
 
-[`.env.example`](.env.example) lists every variable.
+[`.env.example`](.env.example) lists the settings you can add to `.env.local`.
 
 ## Deploy
 
-Click **Deploy with Vercel** above. Vercel copies the repository to your GitHub account
-and asks for four values:
+Click **Deploy with Vercel** above. Vercel copies the repository to your GitHub account,
+creates a private Blob store, and asks for four values:
 
 | Variable | What to enter |
 | --- | --- |
-| `AI_GATEWAY_API_KEY` | Your [AI Gateway](https://vercel.com/docs/ai-gateway) key. |
 | `BROWSERBASE_API_KEY` | Your Browserbase key. The free plan works. |
 | `BENJI_OPERATOR_USERNAME` | A username for signing in to your deployment. |
 | `BENJI_OPERATOR_PASSWORD` | A password of at least 32 characters. |
+| `BENJI_HANDOFF_SECRET` | A random secret of at least 32 characters, for example from `openssl rand -base64 32`. It signs the links Benji sends when it needs you to take over the browser. |
+
+The deployment authenticates to AI Gateway with its own OIDC token, so it needs no model
+key. [AI Gateway](https://vercel.com/docs/ai-gateway) must be available to your team. The
+Blob store keeps saved browser Contexts available to every instance. Handoff links use the
+project's production domain; set `BENJI_PUBLIC_URL` to use another origin.
 
 Open the deployment, sign in with that username and password, and give it a task. To run
 it against your own store, name the store in the task, for example "Buy the black 24 oz
@@ -109,18 +117,23 @@ bottle from yourstore.com and stop at the payment page."
 
 ## Run locally
 
-You need Node.js 24, Bun 1.4.4, Chrome, and a running Docker daemon for Eve's local
-sandbox. Benji needs no database.
+You need Node.js 24, Bun 1.4.4, Chrome, the [Vercel CLI](https://vercel.com/docs/cli), and
+a running Docker daemon for Eve's local sandbox. Benji needs no database.
 
 ```sh
 bun install
-cp .env.example .env.local
-# Fill in AI_GATEWAY_API_KEY and BROWSERBASE_API_KEY, or set STAGEHAND_BROWSER=local.
+vercel link                 # connect this directory to a Vercel project
+vercel env pull .env.local  # writes VERCEL_OIDC_TOKEN for AI Gateway
+# Optional: add BROWSERBASE_API_KEY to .env.local.
 bun run dev
 ```
 
 Open http://127.0.0.1:4320. The first start compiles the agent, and the first
 conversation can take a few minutes while Eve prepares its sandbox.
+
+The pulled token lasts about 12 hours. Run `vercel env pull .env.local` again when the
+app says it has expired. Leave `AI_GATEWAY_API_KEY` unset: Eve prefers a key over the
+OIDC token when both are present.
 
 - `bun run dev` starts Eve on port 4321 and Next.js on port 4320, and stops both together.
   Use it instead of `next dev` so conversations resume after a restart.
@@ -166,7 +179,9 @@ the results so far.
 | `agent/skills/shopping-research/SKILL.md` | Shopping brief, research, comparison, and evidence procedure |
 | `agent/tools/compare_offers.ts` | Delivered totals, unit prices, and budget fit from observed prices |
 | `agent/agent.ts` | Model, session limits, and runtime dependencies |
-| `app/chat.tsx` | Shopping brief, conversation, browser capture, and export |
+| `app/chat.tsx` | Session wiring, starter prompts, and export |
+| `components/chat/` | Transcript, composer, questions, and browser evidence, built on [shadcn/ui AI Elements](https://ui.shadcn.com/docs/ai-elements) |
+| `lib/eve-parts.ts` | The phrase shown for each tool call |
 | `agent/tools/` | Research and browser tools |
 | `server/browser/` | Browser lifecycle, contexts, credentials, and handoff |
 

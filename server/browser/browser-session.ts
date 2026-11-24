@@ -13,6 +13,7 @@ import {
 	parseBrowserbaseCaptchaEvent,
 	safeCaptchaPage,
 } from "../../lib/browser/captcha";
+import { redactUrl } from "../../lib/browser/display-url";
 import { addTrace } from "./trace.js";
 import type {
 	BrowserProxyLocation,
@@ -969,7 +970,7 @@ export function formatRunCode(actions: RunAction[]): string {
 			switch (item.action) {
 				case "goto":
 					return [
-						`await page.goto(${JSON.stringify(safeActivityUrl(item.url))});`,
+						`await page.goto(${JSON.stringify(redactUrl(item.url))});`,
 						'await page.waitForLoadState("domcontentloaded", 15_000);',
 					];
 				case "click":
@@ -993,21 +994,6 @@ export function formatRunCode(actions: RunAction[]): string {
 			return [];
 		})
 		.join("\n");
-}
-
-function safeActivityUrl(value: string): string {
-	try {
-		const url = new URL(value);
-		url.username = "";
-		url.password = "";
-		for (const key of url.searchParams.keys()) {
-			if (/(?:auth|code|key|otp|password|secret|token)/i.test(key))
-				url.searchParams.set(key, "[REDACTED]");
-		}
-		return url.toString();
-	} catch {
-		return value;
-	}
 }
 
 function configuredCaptchaTimeoutMs(): number {

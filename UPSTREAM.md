@@ -11,7 +11,9 @@ Benji's browser runtime is adapted from Browserbase BELL.
 
 The browser session lifecycle, the browser tools (`run`, `snapshot`, `screenshot`),
 reusable Browserbase Contexts, human handoff, the operator credential vault, Baselayer
-merchant access, the Parallel search tools, and the tests for each. Benji does not
+merchant access, and the tests for each. BELL's Parallel search and extract tools are
+replaced by Eve's built-in `web_search`, which runs Parallel through AI Gateway, and
+`web_fetch`. Benji does not
 include BELL's messaging, payment, or monitoring integrations.
 
 ## What Benji adds
@@ -33,6 +35,10 @@ the wordmark, face icon, and app icon.
 
 ## Chat interface
 
-The chat uses adapted [prompt-kit](https://prompt-kit.com) components in
-`components/ui/`. Their MIT notice is in
-[`components/ui/PROMPT-KIT-LICENSE.md`](components/ui/PROMPT-KIT-LICENSE.md).
+The chat follows the [shadcn/ui AI Elements](https://ui.shadcn.com/docs/ai-elements)
+patterns. `components/ui/` holds unmodified shadcn/ui components in the Base UI
+`base-nova` style, added with `bunx shadcn@latest add` and reformatted by Biome;
+[`components.json`](components.json) records the configuration. `components/chat/`
+composes them for Benji and renders Eve's message parts directly from `useEveAgent`,
+with no AI SDK `useChat` layer. Tool calls show a fixed phrase per tool from
+[`lib/eve-parts.ts`](lib/eve-parts.ts), never their input or output.

@@ -6,9 +6,15 @@ conversations and uses Benji's browser runtime directly.
 ```text
 agent/                  Eve agent, tools, hooks, runtime, and channels
 app/                    Benji web interface and handoff routes
+components/             Chat interface and shadcn/ui components
+server/                 Setup checks, operator sign-in, search, and merchant access
 server/browser/         Browser sessions, Context metadata, credentials, and handoff
+lib/                    Shared helpers for the web interface
 lib/browser/            Browser URL and CAPTCHA helpers
+scripts/                Dev launcher, build packaging, and opt-in live tests
+tests/                  Unit tests
 tests/browser/          Browser runtime regression tests and local fixtures
+docs/                   Runtime, provider, and repository guides
 package.json            Application dependencies and commands
 bun.lock                One dependency resolution tree
 ```
@@ -59,8 +65,8 @@ the Browserbase copyright and license terms covering the browser source.
 ## Browser retirement
 
 The web channel releases the hosted browser on terminal session events, including
-when cleanup runs in a fresh worker. Eve 0.79.1 skips global stream hooks for completion outside
-a turn, so cleanup uses channel callbacks. A failed release retains the browser ID and reaches
+when cleanup runs in a fresh worker. Eve 0.79.1 skipped global stream hooks for completion outside
+a turn, and this has not been re-verified on Eve 1.x, so cleanup uses channel callbacks. A failed release retains the browser ID and reaches
 Eve's error logging; failed callbacks are not automatically retried. Starting a new conversation
 ends the prior session and releases its browser. Browserbase sessions still have provider
 lifetimes, so this does not guarantee an indefinitely running browser.

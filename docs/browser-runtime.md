@@ -28,7 +28,7 @@ Hosted browser sessions always disable network logging and recording.
 | `BROWSERBASE_CONTEXT_ID` | Optional existing Context for saved browser state. |
 | `BENJI_BROWSERBASE_PROXIES` | `1` or `true` requests Browserbase managed proxies; off by default. Needs a paid Browserbase plan. A proxy location needs this setting, and a browser started with a location fails without it. |
 | `BENJI_BROWSERBASE_VERIFIED` | `1` or `true` requests a Browserbase Verified Browser; off by default. Needs the Browserbase Enterprise plan. |
-| `BENJI_PUBLIC_URL` | Reachable HTTPS Benji origin for handoff links; loopback HTTP is allowed locally. |
+| `BENJI_PUBLIC_URL` | Reachable HTTPS Benji origin for handoff links; loopback HTTP is allowed locally. On Vercel it defaults to the project's production domain, so set it for a preview deployment or another origin. |
 | `BENJI_HANDOFF_SECRET` | Handoff encryption secret, at least 32 bytes. |
 | `BENJI_HEADLESS` | Local browser headless mode; defaults to `true`. |
 | `BENJI_BROWSER_IDLE_MS` | Browser inactivity timeout; defaults to 30 minutes. |
@@ -47,6 +47,14 @@ Never commit credentials, `.env` files, or `.benji` data. Keep the handoff secre
 stable across restarts.
 
 ## Updating an existing deployment
+
+Benji now authenticates to AI Gateway with the Vercel project's OIDC token, and web search
+runs through AI Gateway too. AI Gateway must be available to the project's team, and
+searches are billed to its AI Gateway usage. Remove `AI_GATEWAY_API_KEY` and
+`PARALLEL_API_KEY` from the project's environment variables and from `.env.local`: Eve
+prefers a gateway key over the OIDC token while one is set, and the app shows a notice until
+it is removed. `PARALLEL_API_KEY` is no longer read. Locally, run `vercel link` and
+`vercel env pull .env.local` to get a token.
 
 This cleanup changes environment names, the default Context metadata path, and the browser
 state namespace. Before deploying it, finish or reset active conversations using the previous

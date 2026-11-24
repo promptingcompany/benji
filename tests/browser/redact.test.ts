@@ -3,10 +3,11 @@ import { describe, expect, it } from "vitest";
 import { redactText, redactValue } from "../../server/browser/redact.js";
 
 describe("trace redaction", () => {
-	it("removes Browserbase, AI Gateway, and model keys", () => {
+	it("removes Browserbase, AI Gateway, OIDC, and model credentials", () => {
 		const text = redactText(
-			"BROWSERBASE_API_KEY=bb_live_abcdefghijkl AI_GATEWAY_API_KEY=gateway-abcdefghijklmnop sk-abcdefghijklmnop",
+			"BROWSERBASE_API_KEY=bb_live_abcdefghijkl AI_GATEWAY_API_KEY=gateway-abcdefghijklmnop VERCEL_OIDC_TOKEN=oidc-abcdefghijklmnop sk-abcdefghijklmnop",
 		);
+		expect(text).not.toContain("oidc-abcdefghijklmnop");
 		expect(text).not.toContain("bb_live_abcdefghijkl");
 		expect(text).not.toContain("gateway-abcdefghijklmnop");
 		expect(text).not.toContain("sk-abcdefghijklmnop");

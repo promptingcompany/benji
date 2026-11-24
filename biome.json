@@ -59,14 +59,22 @@
 			}
 		},
 		{
-			"includes": [
-				"scripts/test-parallel-production.mjs",
-				"scripts/test-session-retirement.mjs"
-			],
+			"includes": ["scripts/test-session-retirement.mjs"],
 			"linter": {
 				"rules": {
 					"correctness": {
 						"noUnsafeFinally": "off"
+					}
+				}
+			}
+		},
+		{
+			"includes": ["components/ui/input-group.tsx", "components/ui/item.tsx"],
+			"linter": {
+				"rules": {
+					"a11y": {
+						"useSemanticElements": "off",
+						"useKeyWithClickEvents": "off"
 					}
 				}
 			}

@@ -8,6 +8,7 @@ import {
 import Browserbase from "@browserbasehq/sdk";
 
 import { toEmbeddedBrowserbaseLiveViewUrl } from "../../lib/browser/live-view";
+import { onVercel } from "../vercel-runtime";
 
 const HANDOFF_VERSION = "v1";
 const DEFAULT_TTL_MS = 10 * 60 * 1_000;
@@ -56,9 +57,7 @@ export function issueBrowserHandoffUrl(
 	target: BrowserHandoffTarget,
 	options: IssueBrowserHandoffOptions = {},
 ): string {
-	const publicUrl = parsePublicUrl(
-		options.publicUrl ?? process.env.BENJI_PUBLIC_URL,
-	);
+	const publicUrl = parsePublicUrl(options.publicUrl ?? defaultPublicUrl());
 	const token = issueBrowserHandoffToken(target, options);
 	return new URL(`/handoff/${token}`, publicUrl).toString();
 }
@@ -233,6 +232,19 @@ function isBrowserHandoffClaim(value: unknown): value is BrowserHandoffClaim {
 		typeof claim.expiresAt === "number" &&
 		Number.isSafeInteger(claim.expiresAt)
 	);
+}
+
+/**
+ * `BENJI_PUBLIC_URL`, or in a Vercel deployment the project's production domain.
+ * A preview deployment therefore links to production unless the variable is set.
+ * A local run always needs the variable, even with a pulled environment.
+ */
+function defaultPublicUrl(): string | undefined {
+	const configured = process.env.BENJI_PUBLIC_URL?.trim();
+	if (configured) return configured;
+	if (!onVercel()) return undefined;
+	const production = process.env.VERCEL_PROJECT_PRODUCTION_URL?.trim();
+	return production ? `https://${production}` : undefined;
 }
 
 function parsePublicUrl(value?: string): URL {
